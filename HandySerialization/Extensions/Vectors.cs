@@ -95,22 +95,22 @@ public static class Vectors
         // ReSharper disable CompareOfFloatsByEqualityOperator
         // ReSharper disable once ShiftExpressionZeroLeftOperand
         if (max == Math.Abs(q.W))
-            flags |= (0b00 << 6);
+            flags |= 0b00 << 6;
         else if (max == Math.Abs(q.X))
-            flags |= (0b01 << 6);
+            flags |= 0b01 << 6;
         else if (max == Math.Abs(q.Y))
-            flags |= (0b10 << 6);
+            flags |= 0b10 << 6;
         else if (max == Math.Abs(q.Z))
-            flags |= (0b11 << 6);
+            flags |= 0b11 << 6;
         else
             throw new InvalidOperationException();
         // ReSharper restore CompareOfFloatsByEqualityOperator
         
         // Output sign bits
-        flags |= (q.W < 0 ? (0b100000) : 0);
-        flags |= (q.X < 0 ? (0b010000) : 0);
-        flags |= (q.Y < 0 ? (0b001000) : 0);
-        flags |= (q.Z < 0 ? (0b000100) : 0);
+        flags |= q.W < 0 ? 0b100000 : 0;
+        flags |= q.X < 0 ? 0b010000 : 0;
+        flags |= q.Y < 0 ? 0b001000 : 0;
+        flags |= q.Z < 0 ? 0b000100 : 0;
 
         // Write the flags
         writer.Write(checked((byte)flags));

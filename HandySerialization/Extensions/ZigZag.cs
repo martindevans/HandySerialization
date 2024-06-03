@@ -20,7 +20,7 @@ public static class ZigZagExtensions
     /// <returns></returns>
     public static short DecodeZigZag(this ushort n)
     {
-        return (short)((n >> 1) ^ (-(n & 1)));
+        return (short)((n >> 1) ^ -(n & 1));
     }
 
     /// <summary>
@@ -41,7 +41,7 @@ public static class ZigZagExtensions
     /// <returns></returns>
     public static int DecodeZigZag(this uint n)
     {
-        return ((int)(n >> 1)) ^ (-((int)(n & 1)));
+        return (int)(n >> 1) ^ -(int)(n & 1);
     }
 
     /// <summary>
@@ -62,7 +62,7 @@ public static class ZigZagExtensions
     /// <returns></returns>
     public static long DecodeZigZag(this ulong n)
     {
-        return (long)((n >> 1) - ((n & 1) * n));
+        return (long)((n >> 1) - (n & 1) * n);
     }
 
     /// <summary>
@@ -74,15 +74,15 @@ public static class ZigZagExtensions
     {
         if (s < 32768)
             return (ushort)(s * 2);
-        else
-            return (ushort)((s - 32767) * 2 - 1);
+        
+        return (ushort)((s - 32767) * 2 - 1);
     }
 
     public static ushort DecodeUnsignedZigZagInterleave(this ushort s)
     {
         if (s % 2 == 1)
             return (ushort)((s + 1) / 2 + 32767);
-        else
-            return (ushort)(s / 2);
+        
+        return (ushort)(s / 2);
     }
 }

@@ -53,6 +53,7 @@ namespace HandySerialization.Tests
 
                 serializer.Write(qin);
                 var qout = serializer.ReadQuaternion();
+                Assert.AreEqual(0, serializer.UnreadBytes);
 
                 var dot = Quaternion.Dot(qin, qout);
                 worst = Math.Min(worst, dot);

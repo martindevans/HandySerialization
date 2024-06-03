@@ -32,7 +32,7 @@ public static class VariableLength
             bytes[count++] = writeByte;
         } while (u != 0);
 
-        writer.Write(bytes.Slice(0, count));
+        writer.Write(bytes[..count]);
     }
 
     public static ulong ReadVariableUInt64<T>(this T reader)
