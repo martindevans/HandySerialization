@@ -2,6 +2,13 @@
 
 public static class Generic
 {
+    public static void Write<TWriter, TValue>(this ref TWriter writer, TValue value)
+        where TWriter : struct, IByteWriter
+        where TValue : IByteSerializable<TValue>
+    {
+        writer.Write(ref value);
+    }
+
     public static void Write<TWriter, TValue>(this ref TWriter writer, ref readonly TValue value)
         where TWriter : struct, IByteWriter
         where TValue : IByteSerializable<TValue>

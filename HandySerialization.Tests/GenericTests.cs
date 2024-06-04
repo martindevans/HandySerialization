@@ -6,7 +6,7 @@ namespace HandySerialization.Tests;
 public class GenericTests
 {
     [TestMethod]
-    public void RoundTrip()
+    public void RoundTripRef()
     {
         var rng = new Random(347245);
 
@@ -14,6 +14,20 @@ public class GenericTests
 
         var input = new TestSerializable(rng.Next(), rng.NextDouble(), rng.NextInt64());
         serializer.Write(ref input);
+        var output = serializer.Read<TestWriterReader, TestSerializable>();
+
+        Assert.AreEqual(input, output);
+    }
+
+    [TestMethod]
+    public void RoundTrip()
+    {
+        var rng = new Random(68456);
+
+        var serializer = new TestWriterReader();
+
+        var input = new TestSerializable(rng.Next(), rng.NextDouble(), rng.NextInt64());
+        serializer.Write(input);
         var output = serializer.Read<TestWriterReader, TestSerializable>();
 
         Assert.AreEqual(input, output);
