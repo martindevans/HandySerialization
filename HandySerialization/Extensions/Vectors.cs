@@ -4,13 +4,13 @@ namespace HandySerialization.Extensions;
 
 public static class Vectors
 {
-    public static void WriteNormalizedVector3<T>(this T writer, float x, float y, float z)
+    public static void WriteNormalizedVector3<T>(this ref T writer, float x, float y, float z)
         where T : struct, IByteWriter
     {
         writer.WriteNormalizedVector3(new Vector3(x, y, z));
     }
 
-    public static void ReadNormalizedVector3<T>(this T reader, out float x, out float y, out float z)
+    public static void ReadNormalizedVector3<T>(this ref T reader, out float x, out float y, out float z)
         where T : struct, IByteReader
     {
         var v = reader.ReadNormalizedVector3();
@@ -20,7 +20,7 @@ public static class Vectors
     }
 
 
-    public static void WriteNormalizedVector3<T>(this T writer, Vector3 xyz)
+    public static void WriteNormalizedVector3<T>(this ref T writer, Vector3 xyz)
         where T : struct, IByteWriter
     {
         // http://aras-p.info/texts/CompactNormalStorage.html
@@ -35,7 +35,7 @@ public static class Vectors
         writer.Write(enc.Y);
     }
 
-    public static Vector3 ReadNormalizedVector3<T>(this T reader)
+    public static Vector3 ReadNormalizedVector3<T>(this ref T reader)
         where T : struct, IByteReader
     {
         // http://aras-p.info/texts/CompactNormalStorage.html
@@ -70,7 +70,7 @@ public static class Vectors
     /// <param name="writer"></param>
     /// <param name="q"></param>
     /// <exception cref="InvalidOperationException"></exception>
-    public static void Write<T>(this T writer, Quaternion q)
+    public static void Write<T>(this ref T writer, Quaternion q)
         where T : struct, IByteWriter
     {
         const float oneOverSqrt2 = 0.7071067f;
@@ -140,7 +140,7 @@ public static class Vectors
         }
     }
 
-    public static Quaternion ReadQuaternion<T>(this T reader)
+    public static Quaternion ReadQuaternion<T>(this ref T reader)
         where T : struct, IByteReader
     {
         const float oneOverSqrt2 = 0.7071067f;

@@ -6,7 +6,7 @@ namespace HandySerialization.Extensions;
 
 public static class Primitives
 {
-    public static void Write<T>(this T writer, bool b0, bool b1 = false, bool b2 = false, bool b3 = false, bool b4 = false, bool b5 = false, bool b6 = false, bool b7 = false)
+    public static void Write<T>(this ref T writer, bool b0, bool b1 = false, bool b2 = false, bool b3 = false, bool b4 = false, bool b5 = false, bool b6 = false, bool b7 = false)
         where T : struct, IByteWriter
     {
         var b = (byte)(
@@ -22,7 +22,7 @@ public static class Primitives
         writer.Write(b);
     }
 
-    public static void ReadBool<T>(this T reader, out bool b0, out bool b1, out bool b2, out bool b3, out bool b4, out bool b5, out bool b6, out bool b7)
+    public static void ReadBool<T>(this ref T reader, out bool b0, out bool b1, out bool b2, out bool b3, out bool b4, out bool b5, out bool b6, out bool b7)
         where T : struct, IByteReader
     {
         var b = reader.ReadUInt8();
@@ -38,14 +38,14 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this T writer, byte b)
+    public static void Write<T>(this ref T writer, byte b)
         where T : struct, IByteWriter
     {
         Span<byte> dest = [ b ];
         writer.Write(dest);
     }
 
-    public static byte ReadUInt8<T>(this T reader)
+    public static byte ReadUInt8<T>(this ref T reader)
         where T : struct, IByteReader
     {
         Span<byte> dest = stackalloc byte[1];
@@ -54,14 +54,14 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this T writer, sbyte b)
+    public static void Write<T>(this ref T writer, sbyte b)
         where T : struct, IByteWriter
     {
         var union8 = new Union8 { SByte = b };
         writer.Write(union8.Byte);
     }
 
-    public static sbyte ReadInt8<T>(this T reader)
+    public static sbyte ReadInt8<T>(this ref T reader)
         where T : struct, IByteReader
     {
         var union8 = new Union8 { Byte = reader.ReadUInt8() };
@@ -69,7 +69,7 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this T writer, ushort s)
+    public static void Write<T>(this ref T writer, ushort s)
         where T : struct, IByteWriter
     {
         var union16 = new Union16 { UShort = s };
@@ -78,7 +78,7 @@ public static class Primitives
         writer.Write(union16.Byte1);
     }
 
-    public static ushort ReadUInt16<T>(this T reader)
+    public static ushort ReadUInt16<T>(this ref T reader)
         where T : struct, IByteReader
     {
         var union16 = new Union16 { Byte0 = reader.ReadUInt8(), Byte1 = reader.ReadUInt8() };
@@ -86,7 +86,7 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this T writer, short s)
+    public static void Write<T>(this ref T writer, short s)
         where T : struct, IByteWriter
     {
         var union16 = new Union16 { Short = s };
@@ -95,7 +95,7 @@ public static class Primitives
         writer.Write(union16.Byte1);
     }
 
-    public static short ReadInt16<T>(this T reader)
+    public static short ReadInt16<T>(this ref T reader)
         where T : struct, IByteReader
     {
         var union16 = new Union16 { Byte0 = reader.ReadUInt8(), Byte1 = reader.ReadUInt8() };
@@ -103,7 +103,7 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this T writer, uint i)
+    public static void Write<T>(this ref T writer, uint i)
         where T : struct, IByteWriter
     {
         var union32 = new Union32 { UInt = i };
@@ -114,7 +114,7 @@ public static class Primitives
         writer.Write(union32.Byte3);
     }
 
-    public static uint ReadUInt32<T>(this T reader)
+    public static uint ReadUInt32<T>(this ref T reader)
         where T : struct, IByteReader
     {
         var union32 = new Union32
@@ -128,7 +128,7 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this T writer, int i)
+    public static void Write<T>(this ref T writer, int i)
         where T : struct, IByteWriter
     {
         var union32 = new Union32 { Int = i };
@@ -139,7 +139,7 @@ public static class Primitives
         writer.Write(union32.Byte3);
     }
 
-    public static int ReadInt32<T>(this T reader)
+    public static int ReadInt32<T>(this ref T reader)
         where T : struct, IByteReader
     {
         var union32 = new Union32
@@ -153,7 +153,7 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this T writer, ulong l)
+    public static void Write<T>(this ref T writer, ulong l)
         where T : struct, IByteWriter
     {
         var union64 = new Union64 { ULong = l };
@@ -168,7 +168,7 @@ public static class Primitives
         writer.Write(union64.Byte7);
     }
 
-    public static ulong ReadUInt64<T>(this T reader)
+    public static ulong ReadUInt64<T>(this ref T reader)
         where T : struct, IByteReader
     {
         var union64 = new Union64
@@ -186,7 +186,7 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this T writer, long l)
+    public static void Write<T>(this ref T writer, long l)
         where T : struct, IByteWriter
     {
         var union64 = new Union64 { Long = l };
@@ -201,7 +201,7 @@ public static class Primitives
         writer.Write(union64.Byte7);
     }
 
-    public static long ReadInt64<T>(this T reader)
+    public static long ReadInt64<T>(this ref T reader)
         where T : struct, IByteReader
     {
         var union64 = new Union64
@@ -219,7 +219,7 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this T writer, float f)
+    public static void Write<T>(this ref T writer, float f)
         where T : struct, IByteWriter
     {
         var union32 = new Union32 { Float = f };
@@ -230,7 +230,7 @@ public static class Primitives
         writer.Write(union32.Byte3);
     }
 
-    public static float ReadFloat32<T>(this T reader)
+    public static float ReadFloat32<T>(this ref T reader)
         where T : struct, IByteReader
     {
         var union32 = new Union32
@@ -244,7 +244,7 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this T writer, double d)
+    public static void Write<T>(this ref T writer, double d)
         where T : struct, IByteWriter
     {
         var union64 = new Union64 { Double = d };
@@ -259,7 +259,7 @@ public static class Primitives
         writer.Write(union64.Byte7);
     }
 
-    public static double ReadFloat64<T>(this T reader)
+    public static double ReadFloat64<T>(this ref T reader)
         where T : struct, IByteReader
     {
         var union64 = new Union64
@@ -277,7 +277,7 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this T writer, string str)
+    public static void Write<T>(this ref T writer, string str)
         where T : struct, IByteWriter
     {
         var byteCount = Encoding.UTF8.GetByteCount(str);
@@ -295,7 +295,7 @@ public static class Primitives
         }
     }
 
-    public static string ReadString<T>(this T reader)
+    public static string ReadString<T>(this ref T reader)
         where T : struct, IByteReader
     {
         var byteCount = (int)reader.ReadVariableUInt64();
@@ -315,13 +315,13 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this T writer, TimeSpan t)
+    public static void Write<T>(this ref T writer, TimeSpan t)
         where T : struct, IByteWriter
     {
         writer.WriteVariableInt64(t.Ticks);
     }
 
-    public static TimeSpan ReadTimeSpan<T>(this T reader)
+    public static TimeSpan ReadTimeSpan<T>(this ref T reader)
         where T : struct, IByteReader
     {
         return new TimeSpan(reader.ReadVariableInt64());
