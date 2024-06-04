@@ -1,6 +1,8 @@
 ﻿using System.Buffers;
+using System.Buffers.Binary;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
-using HandySerialization.Unions;
 
 namespace HandySerialization.Extensions;
 
@@ -57,223 +59,173 @@ public static class Primitives
     public static void Write<T>(this ref T writer, sbyte b)
         where T : struct, IByteWriter
     {
-        var union8 = new Union8 { SByte = b };
-        writer.Write(union8.Byte);
+        writer.Write(unchecked((byte)b));
     }
 
     public static sbyte ReadInt8<T>(this ref T reader)
         where T : struct, IByteReader
     {
-        var union8 = new Union8 { Byte = reader.ReadUInt8() };
-        return union8.SByte;
+        return unchecked((sbyte)reader.ReadUInt8());
     }
 
 
     public static void Write<T>(this ref T writer, ushort s)
         where T : struct, IByteWriter
     {
-        var union16 = new Union16 { UShort = s };
+        Span<byte> span = stackalloc byte[2];
+        BinaryPrimitives.WriteUInt16BigEndian(span, s);
 
-        writer.Write(union16.Byte0);
-        writer.Write(union16.Byte1);
+        writer.Write(span);
     }
 
     public static ushort ReadUInt16<T>(this ref T reader)
         where T : struct, IByteReader
     {
-        var union16 = new Union16 { Byte0 = reader.ReadUInt8(), Byte1 = reader.ReadUInt8() };
-        return union16.UShort;
+        Span<byte> span = stackalloc byte[2];
+        reader.ReadBytes(span);
+
+        return BinaryPrimitives.ReadUInt16BigEndian(span);
     }
 
 
     public static void Write<T>(this ref T writer, short s)
         where T : struct, IByteWriter
     {
-        var union16 = new Union16 { Short = s };
+        Span<byte> span = stackalloc byte[2];
+        BinaryPrimitives.WriteInt16BigEndian(span, s);
 
-        writer.Write(union16.Byte0);
-        writer.Write(union16.Byte1);
+        writer.Write(span);
     }
 
     public static short ReadInt16<T>(this ref T reader)
         where T : struct, IByteReader
     {
-        var union16 = new Union16 { Byte0 = reader.ReadUInt8(), Byte1 = reader.ReadUInt8() };
-        return union16.Short;
+        Span<byte> span = stackalloc byte[2];
+        reader.ReadBytes(span);
+
+        return BinaryPrimitives.ReadInt16BigEndian(span);
     }
 
 
     public static void Write<T>(this ref T writer, uint i)
         where T : struct, IByteWriter
     {
-        var union32 = new Union32 { UInt = i };
+        Span<byte> span = stackalloc byte[4];
+        BinaryPrimitives.WriteUInt32BigEndian(span, i);
 
-        writer.Write(union32.Byte0);
-        writer.Write(union32.Byte1);
-        writer.Write(union32.Byte2);
-        writer.Write(union32.Byte3);
+        writer.Write(span);
     }
 
     public static uint ReadUInt32<T>(this ref T reader)
         where T : struct, IByteReader
     {
-        var union32 = new Union32
-        {
-            Byte0 = reader.ReadUInt8(),
-            Byte1 = reader.ReadUInt8(),
-            Byte2 = reader.ReadUInt8(),
-            Byte3 = reader.ReadUInt8()
-        };
-        return union32.UInt;
+        Span<byte> span = stackalloc byte[4];
+        reader.ReadBytes(span);
+
+        return BinaryPrimitives.ReadUInt32BigEndian(span);
     }
 
 
     public static void Write<T>(this ref T writer, int i)
         where T : struct, IByteWriter
     {
-        var union32 = new Union32 { Int = i };
+        Span<byte> span = stackalloc byte[4];
+        BinaryPrimitives.WriteInt32BigEndian(span, i);
 
-        writer.Write(union32.Byte0);
-        writer.Write(union32.Byte1);
-        writer.Write(union32.Byte2);
-        writer.Write(union32.Byte3);
+        writer.Write(span);
     }
 
     public static int ReadInt32<T>(this ref T reader)
         where T : struct, IByteReader
     {
-        var union32 = new Union32
-        {
-            Byte0 = reader.ReadUInt8(),
-            Byte1 = reader.ReadUInt8(),
-            Byte2 = reader.ReadUInt8(),
-            Byte3 = reader.ReadUInt8()
-        };
-        return union32.Int;
+        Span<byte> span = stackalloc byte[4];
+        reader.ReadBytes(span);
+
+        return BinaryPrimitives.ReadInt32BigEndian(span);
     }
 
 
     public static void Write<T>(this ref T writer, ulong l)
         where T : struct, IByteWriter
     {
-        var union64 = new Union64 { ULong = l };
+        Span<byte> span = stackalloc byte[8];
+        BinaryPrimitives.WriteUInt64BigEndian(span, l);
 
-        writer.Write(union64.Byte0);
-        writer.Write(union64.Byte1);
-        writer.Write(union64.Byte2);
-        writer.Write(union64.Byte3);
-        writer.Write(union64.Byte4);
-        writer.Write(union64.Byte5);
-        writer.Write(union64.Byte6);
-        writer.Write(union64.Byte7);
+        writer.Write(span);
     }
 
     public static ulong ReadUInt64<T>(this ref T reader)
         where T : struct, IByteReader
     {
-        var union64 = new Union64
-        {
-            Byte0 = reader.ReadUInt8(),
-            Byte1 = reader.ReadUInt8(),
-            Byte2 = reader.ReadUInt8(),
-            Byte3 = reader.ReadUInt8(),
-            Byte4 = reader.ReadUInt8(),
-            Byte5 = reader.ReadUInt8(),
-            Byte6 = reader.ReadUInt8(),
-            Byte7 = reader.ReadUInt8(),
-        };
-        return union64.ULong;
+        Span<byte> span = stackalloc byte[8];
+        reader.ReadBytes(span);
+
+        return BinaryPrimitives.ReadUInt64BigEndian(span);
     }
 
 
     public static void Write<T>(this ref T writer, long l)
         where T : struct, IByteWriter
     {
-        var union64 = new Union64 { Long = l };
+        Span<byte> span = stackalloc byte[8];
+        BinaryPrimitives.WriteInt64BigEndian(span, l);
 
-        writer.Write(union64.Byte0);
-        writer.Write(union64.Byte1);
-        writer.Write(union64.Byte2);
-        writer.Write(union64.Byte3);
-        writer.Write(union64.Byte4);
-        writer.Write(union64.Byte5);
-        writer.Write(union64.Byte6);
-        writer.Write(union64.Byte7);
+        writer.Write(span);
     }
 
     public static long ReadInt64<T>(this ref T reader)
         where T : struct, IByteReader
     {
-        var union64 = new Union64
-        {
-            Byte0 = reader.ReadUInt8(),
-            Byte1 = reader.ReadUInt8(),
-            Byte2 = reader.ReadUInt8(),
-            Byte3 = reader.ReadUInt8(),
-            Byte4 = reader.ReadUInt8(),
-            Byte5 = reader.ReadUInt8(),
-            Byte6 = reader.ReadUInt8(),
-            Byte7 = reader.ReadUInt8(),
-        };
-        return union64.Long;
+        Span<byte> span = stackalloc byte[8];
+        reader.ReadBytes(span);
+
+        return BinaryPrimitives.ReadInt64BigEndian(span);
     }
 
 
     public static void Write<T>(this ref T writer, float f)
         where T : struct, IByteWriter
     {
-        var union32 = new Union32 { Float = f };
+        var span = MemoryMarshal.Cast<float, byte>(stackalloc float[1] { f });
+        if (BitConverter.IsLittleEndian)
+            span.Reverse();
 
-        writer.Write(union32.Byte0);
-        writer.Write(union32.Byte1);
-        writer.Write(union32.Byte2);
-        writer.Write(union32.Byte3);
+        writer.Write(span);
     }
 
     public static float ReadFloat32<T>(this ref T reader)
         where T : struct, IByteReader
     {
-        var union32 = new Union32
-        {
-            Byte0 = reader.ReadUInt8(),
-            Byte1 = reader.ReadUInt8(),
-            Byte2 = reader.ReadUInt8(),
-            Byte3 = reader.ReadUInt8()
-        };
-        return union32.Float;
+        Span<byte> span = stackalloc byte[4];
+        reader.ReadBytes(span);
+
+        if (BitConverter.IsLittleEndian)
+            span.Reverse();
+
+        return MemoryMarshal.Cast<byte, float>(span)[0];
     }
 
 
     public static void Write<T>(this ref T writer, double d)
         where T : struct, IByteWriter
     {
-        var union64 = new Union64 { Double = d };
+        var span = MemoryMarshal.Cast<double, byte>(stackalloc double[1] { d });
+        if (BitConverter.IsLittleEndian)
+            span.Reverse();
 
-        writer.Write(union64.Byte0);
-        writer.Write(union64.Byte1);
-        writer.Write(union64.Byte2);
-        writer.Write(union64.Byte3);
-        writer.Write(union64.Byte4);
-        writer.Write(union64.Byte5);
-        writer.Write(union64.Byte6);
-        writer.Write(union64.Byte7);
+        writer.Write(span);
     }
 
     public static double ReadFloat64<T>(this ref T reader)
         where T : struct, IByteReader
     {
-        var union64 = new Union64
-        {
-            Byte0 = reader.ReadUInt8(),
-            Byte1 = reader.ReadUInt8(),
-            Byte2 = reader.ReadUInt8(),
-            Byte3 = reader.ReadUInt8(),
-            Byte4 = reader.ReadUInt8(),
-            Byte5 = reader.ReadUInt8(),
-            Byte6 = reader.ReadUInt8(),
-            Byte7 = reader.ReadUInt8(),
-        };
-        return union64.Double;
+        Span<byte> span = stackalloc byte[8];
+        reader.ReadBytes(span);
+
+        if (BitConverter.IsLittleEndian)
+            span.Reverse();
+
+        return MemoryMarshal.Cast<byte, double>(span)[0];
     }
 
 
