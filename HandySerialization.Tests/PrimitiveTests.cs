@@ -264,5 +264,23 @@ namespace HandySerialization.Tests
                 Assert.AreEqual(input, output);
             }
         }
+
+        [TestMethod]
+        public void RoundTripTimeSpan()
+        {
+            var rng = new Random(34576235);
+
+            const int count = 100_000;
+            for (var i = 0; i <= count; i++)
+            {
+                var input = TimeSpan.FromTicks(rng.NextInt64());
+
+                var serializer = new TestWriterReader();
+                serializer.Write(input);
+                var output = serializer.ReadTimeSpan();
+
+                Assert.AreEqual(input, output);
+            }
+        }
     }
 }

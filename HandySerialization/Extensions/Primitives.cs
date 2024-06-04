@@ -6,7 +6,7 @@ namespace HandySerialization.Extensions;
 
 public static class Primitives
 {
-    public static void Write<T>(this T writer, bool b0, bool b1, bool b2, bool b3, bool b4, bool b5, bool b6, bool b7)
+    public static void Write<T>(this T writer, bool b0, bool b1 = false, bool b2 = false, bool b3 = false, bool b4 = false, bool b5 = false, bool b6 = false, bool b7 = false)
         where T : struct, IByteWriter
     {
         var b = (byte)(
@@ -312,5 +312,18 @@ public static class Primitives
         {
             ArrayPool<byte>.Shared.Return(bytes);
         }
+    }
+
+
+    public static void Write<T>(this T writer, TimeSpan t)
+        where T : struct, IByteWriter
+    {
+        writer.WriteVariableInt64(t.Ticks);
+    }
+
+    public static TimeSpan ReadTimeSpan<T>(this T reader)
+        where T : struct, IByteReader
+    {
+        return new TimeSpan(reader.ReadVariableInt64());
     }
 }

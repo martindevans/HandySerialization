@@ -102,8 +102,6 @@ public static class Vectors
             flags |= 0b10 << 6;
         else if (max == Math.Abs(q.Z))
             flags |= 0b11 << 6;
-        else
-            throw new InvalidOperationException();
         // ReSharper restore CompareOfFloatsByEqualityOperator
         
         // Output sign bits
@@ -155,7 +153,7 @@ public static class Vectors
         var c = reader.ReadRangeLimitedFloat16(0, oneOverSqrt2);
 
         // Recover all 4 components
-        float w, x, y, z;
+        float w = 0, x = 0, y = 0, z = 0;
         var max = (flags & 0b1100_0000) >> 6;
         switch (max)
         {
@@ -186,9 +184,6 @@ public static class Vectors
                 y = c;
                 z = MathF.Sqrt(1 - w * w - x * x - y * y);
                 break;
-
-            default:
-                throw new InvalidOperationException();
         }
 
         // Recover signs
