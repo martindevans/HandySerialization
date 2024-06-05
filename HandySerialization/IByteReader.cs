@@ -5,7 +5,7 @@ public interface IByteReader
     /// <summary>
     /// Get how many unread bytes there are
     /// </summary>
-    public int UnreadBytes { get; }
+    public long UnreadBytes { get; }
 
     /// <summary>
     /// Read some bytes

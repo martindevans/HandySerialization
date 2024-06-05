@@ -15,7 +15,7 @@ public readonly struct TestWriterReader
     }
 
 
-    public int UnreadBytes => _bytes.Count;
+    public long UnreadBytes => _bytes.Count;
 
     public void ReadBytes(Span<byte> dest)
     {
