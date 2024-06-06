@@ -23,4 +23,10 @@ public struct MemoryByteReader(ReadOnlyMemory<byte> memory)
         memory.Slice(_readBytes, dest.Length).Span.CopyTo(dest);
         _readBytes += dest.Length;
     }
+
+    public ReadOnlySpan<byte> ReadBytes(int count)
+    {
+        _readBytes += count;
+        return memory.Slice(_readBytes, count).Span;
+    }
 }
