@@ -4,6 +4,14 @@ namespace HandySerialization.Extensions;
 
 public static class Vectors
 {
+    /// <summary>
+    /// Write a normalized (i.e. length=1) vector using 64 bits
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="writer"></param>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="z"></param>
     public static void WriteNormalizedVector3<T>(this ref T writer, float x, float y, float z)
         where T : struct, IByteWriter
     {
@@ -20,6 +28,12 @@ public static class Vectors
     }
 
 
+    /// <summary>
+    /// Write a normalized (i.e. length=1) vector using 64 bits
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="writer"></param>
+    /// <param name="xyz"></param>
     public static void WriteNormalizedVector3<T>(this ref T writer, Vector3 xyz)
         where T : struct, IByteWriter
     {
@@ -61,7 +75,34 @@ public static class Vectors
 
 
     /// <summary>
-    /// Write a quaternion using 56bits (7 bytes). One byte is used as a header and then
+    /// Write a quaternion using 128 bits (full 32 bit float per channel)
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="writer"></param>
+    /// <param name="q"></param>
+    public static void Write<T>(this ref T writer, Quaternion q)
+        where T : struct, IByteWriter
+    {
+        writer.Write(q.X);
+        writer.Write(q.Y);
+        writer.Write(q.Z);
+        writer.Write(q.W);
+    }
+
+    public static Quaternion ReadQuaternion<T>(this ref T reader)
+        where T : struct, IByteReader
+    {
+        return new Quaternion(
+            reader.ReadFloat32(),
+            reader.ReadFloat32(),
+            reader.ReadFloat32(),
+            reader.ReadFloat32()
+        );
+    }
+
+
+    /// <summary>
+    /// Write a quaternion using 56bits. One byte is used as a header and then
     /// 2 bytes is used for each of the three smallest channels. The largest channel is
     /// recovered mathematically from the fact a quaternion is unit length. Signs for all
     /// channels are preserved.
@@ -70,7 +111,7 @@ public static class Vectors
     /// <param name="writer"></param>
     /// <param name="q"></param>
     /// <exception cref="InvalidOperationException"></exception>
-    public static void Write<T>(this ref T writer, Quaternion q)
+    public static void WriteCompressedQuaternion<T>(this ref T writer, Quaternion q)
         where T : struct, IByteWriter
     {
         const float oneOverSqrt2 = 0.7071067f;
@@ -140,7 +181,7 @@ public static class Vectors
         }
     }
 
-    public static Quaternion ReadQuaternion<T>(this ref T reader)
+    public static Quaternion ReadCompressedQuaternion<T>(this ref T reader)
         where T : struct, IByteReader
     {
         const float oneOverSqrt2 = 0.7071067f;

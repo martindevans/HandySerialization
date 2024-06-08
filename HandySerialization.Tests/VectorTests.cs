@@ -36,7 +36,7 @@ namespace HandySerialization.Tests
         }
 
         [TestMethod]
-        public void NormalizedQuaternionRoundTrip()
+        public void CompressedQuaternionRoundTrip()
         {
             var rng = new Random(3572456);
 
@@ -51,8 +51,8 @@ namespace HandySerialization.Tests
                 var angle = rng.NextSingle() * (float)Math.PI * 2;
                 var qin = Quaternion.CreateFromAxisAngle(axis, angle);
 
-                serializer.Write(qin);
-                var qout = serializer.ReadQuaternion();
+                serializer.WriteCompressedQuaternion(qin);
+                var qout = serializer.ReadCompressedQuaternion();
                 Assert.AreEqual(0, serializer.UnreadBytes);
 
                 var dot = Quaternion.Dot(qin, qout);
@@ -71,6 +71,28 @@ namespace HandySerialization.Tests
             Console.WriteLine($"Average case case = {avgAngle} degrees");
 
             Assert.IsTrue(errAngle < 0.05f);
+        }
+
+        [TestMethod]
+        public void QuaternionRoundTrip()
+        {
+            var rng = new Random(3572456);
+
+            const int count = 1_000_000;
+            for (var i = 0; i < count; i++)
+            {
+                var serializer = new TestWriterReader();
+
+                var axis = Vector3.Normalize(new Vector3(rng.NextSingle() * 2 - 1, rng.NextSingle() * 2 - 1, rng.NextSingle() * 2 - 1));
+                var angle = rng.NextSingle() * (float)Math.PI * 2;
+                var qin = Quaternion.CreateFromAxisAngle(axis, angle);
+
+                serializer.Write(qin);
+                var qout = serializer.ReadQuaternion();
+                Assert.AreEqual(0, serializer.UnreadBytes);
+
+                Assert.AreEqual(qin, qout);
+            }
         }
     }
 }

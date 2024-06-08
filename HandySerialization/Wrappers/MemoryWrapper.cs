@@ -26,7 +26,8 @@ public struct MemoryByteReader(ReadOnlyMemory<byte> memory)
 
     public ReadOnlySpan<byte> ReadBytes(int count)
     {
+        var slice = memory.Slice(_readBytes, count).Span;
         _readBytes += count;
-        return memory.Slice(_readBytes, count).Span;
+        return slice;
     }
 }

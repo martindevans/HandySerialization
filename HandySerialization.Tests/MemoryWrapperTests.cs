@@ -26,4 +26,23 @@ public class MemoryWrapperTests
         Assert.AreEqual(55555, reader.ReadVariableInt64());
         Assert.AreEqual(0, reader.UnreadBytes);
     }
+
+    [TestMethod]
+    public void ReadSpan()
+    {
+        var bytes = new byte[128];
+
+        var writer = new MemoryByteWriter(bytes);
+        writer.Write([1, 2, 3, 4, 5]);
+
+        var reader = new MemoryByteReader(bytes.AsMemory(0, writer.Written));
+        var read = reader.ReadBytes(5);
+
+        Assert.AreEqual(1, read[0]);
+        Assert.AreEqual(2, read[1]);
+        Assert.AreEqual(3, read[2]);
+        Assert.AreEqual(4, read[3]);
+        Assert.AreEqual(5, read[4]);
+        Assert.AreEqual(5, read.Length);
+    }
 }
