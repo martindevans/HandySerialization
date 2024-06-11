@@ -100,4 +100,76 @@ public class FloatTests
             Assert.AreEqual(input, output, (2 * range) / ushort.MaxValue);
         }
     }
+
+    [TestMethod]
+    public void RoundTripFloatSequenceFloat32()
+    {
+        var rng = new Random(347245);
+
+        const int count = 2500;
+        for (var i = 0; i < count; i++)
+        {
+            var sequence = new float[count];
+            for (var j = 0; j < sequence.Length; j++)
+            {
+                if (j == 0)
+                    sequence[j] = (rng.NextSingle() - 0.5f) * 1_000_000;
+                else
+                    sequence[j] = sequence[j - 1] + (rng.NextSingle() - 0.5f) * 1_000f;
+            }
+
+            var serializer = new TestWriterReader();
+
+            serializer.WriteSequenceFloat32(sequence);
+
+            var expected = sequence.Length * 4 + 4;
+            var actual = serializer.UnreadBytes;
+            var saved = expected - actual;
+            var factor = actual / (float)expected;
+            Console.WriteLine($"Saved: {saved} ({factor}x)");
+            Assert.IsTrue(expected >= actual - 100);
+
+            var length = serializer.ReadSequenceLengthFloat32();
+            var output = new float[length];
+            serializer.ReadSequenceValuesFloat32(output);
+
+            Assert.IsTrue(sequence.SequenceEqual(output));
+        }
+    }
+
+    [TestMethod]
+    public void RoundTripFloatSequenceFloat64()
+    {
+        var rng = new Random(347245);
+
+        const int count = 2500;
+        for (var i = 0; i < count; i++)
+        {
+            var sequence = new double[count];
+            for (var j = 0; j < sequence.Length; j++)
+            {
+                if (j == 0)
+                    sequence[j] = (rng.NextDouble() - 0.5) * 1_000_000;
+                else
+                    sequence[j] = sequence[j - 1] + (rng.NextDouble() - 0.5) * 1_000;
+            }
+
+            var serializer = new TestWriterReader();
+
+            serializer.WriteSequenceFloat64(sequence);
+
+            var expected = sequence.Length * 8 + 4;
+            var actual = serializer.UnreadBytes;
+            var saved = expected - actual;
+            var factor = actual / (float)expected;
+            Console.WriteLine($"Saved: {saved} ({factor}x)");
+            Assert.IsTrue(expected >= actual - 200);
+
+            var length = serializer.ReadSequenceLengthFloat64();
+            var output = new double[length];
+            serializer.ReadSequenceValuesFloat64(output);
+
+            Assert.IsTrue(sequence.SequenceEqual(output));
+        }
+    }
 }

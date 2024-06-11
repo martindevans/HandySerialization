@@ -58,4 +58,93 @@ public static class Floats
     {
         return reader.ReadNormalizedFloat16() * range + min;
     }
+
+
+    /// <summary>
+    /// Write a sequence of floats, with variable length encoding. For totally uncorrelated data this will make
+    /// the output data about 1.2x <b>larger</b>! However if the data are correlated (e.g. with ~1,000,000 of each other)
+    /// then this will save be about 0.85x **smaller**.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="writer"></param>
+    /// <param name="floats"></param>
+    public static void WriteSequenceFloat32<T>(this ref T writer, ReadOnlySpan<float> floats)
+        where T : struct, IByteWriter
+    {
+        writer.WriteVariableUInt64((ulong)floats.Length);
+
+        var prev = 0;
+        for (var i = 0; i < floats.Length; i++)
+        {
+            var fint = BitConverter.SingleToInt32Bits(floats[i]);
+            var xor = fint ^ prev;
+            prev = fint;
+            writer.WriteVariableInt64(xor);
+        }
+    }
+
+    public static int ReadSequenceLengthFloat32<T>(this ref T reader)
+        where T : struct, IByteReader
+    {
+        return checked((int)reader.ReadVariableUInt64());
+    }
+
+    public static void ReadSequenceValuesFloat32<T>(this ref T reader, Span<float> dest)
+        where T : struct, IByteReader
+    {
+        var prev = 0;
+
+        for (var i = 0; i < dest.Length; i++)
+        {
+            var xor = (int)reader.ReadVariableInt64();
+            var fint = xor ^ prev;
+            prev = fint;
+
+            dest[i] = BitConverter.Int32BitsToSingle(fint);
+        }
+    }
+
+
+    /// <summary>
+    /// Write a sequence of doubles, with variable length encoding. For totally uncorrelated data this will make
+    /// the output data about 1.2x <b>larger</b>! However if the data are correlated (e.g. with ~1,000,000 of each other)
+    /// then this will save be about 0.85x **smaller**.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="writer"></param>
+    /// <param name="floats"></param>
+    public static void WriteSequenceFloat64<T>(this ref T writer, ReadOnlySpan<double> floats)
+        where T : struct, IByteWriter
+    {
+        writer.WriteVariableUInt64((ulong)floats.Length);
+
+        var prev = 0L;
+        for (var i = 0; i < floats.Length; i++)
+        {
+            var fint = BitConverter.DoubleToInt64Bits(floats[i]);
+            var xor = fint ^ prev;
+            prev = fint;
+            writer.WriteVariableInt64(xor);
+        }
+    }
+
+    public static int ReadSequenceLengthFloat64<T>(this ref T reader)
+        where T : struct, IByteReader
+    {
+        return checked((int)reader.ReadVariableUInt64());
+    }
+
+    public static void ReadSequenceValuesFloat64<T>(this ref T reader, Span<double> dest)
+        where T : struct, IByteReader
+    {
+        var prev = 0L;
+        for (var i = 0; i < dest.Length; i++)
+        {
+            var xor = reader.ReadVariableInt64();
+            var fint = xor ^ prev;
+            prev = fint;
+
+            dest[i] = BitConverter.Int64BitsToDouble(fint);
+        }
+    }
 }

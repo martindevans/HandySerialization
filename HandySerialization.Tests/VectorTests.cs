@@ -36,6 +36,38 @@ namespace HandySerialization.Tests
         }
 
         [TestMethod]
+        public void NormalizedVector2RoundTrip()
+        {
+            var rng = new Random(3572456);
+
+            var worst = 100f;
+
+            for (var i = 0; i < 10000; i++)
+            {
+                var serializer = new TestWriterReader();
+
+                var vin = Vector2.Normalize(new Vector2(rng.NextSingle() * 2 - 1, rng.NextSingle() * 2 - 1));
+                serializer.WriteNormalizedVector2(vin.X, vin.Y);
+                serializer.ReadNormalizedVector2(out var ox, out var oy);
+                var vout = new Vector2(ox, oy);
+
+                var dot = Vector2.Dot(vin, vout);
+                worst = Math.Min(worst, dot);
+
+                if (float.IsNaN(dot))
+                    Assert.Fail();
+
+                if (dot < 0.95)
+                    Assert.Fail();
+            }
+
+            var angle = float.RadiansToDegrees(MathF.Acos(worst));
+            Console.WriteLine($"Worst case = {worst} ({angle} degrees)");
+
+            Assert.IsTrue(angle < 0.03f);
+        }
+
+        [TestMethod]
         public void CompressedQuaternionRoundTrip()
         {
             var rng = new Random(3572456);

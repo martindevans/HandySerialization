@@ -5,6 +5,52 @@ namespace HandySerialization.Extensions;
 public static class Vectors
 {
     /// <summary>
+    /// Write a normalized (i.e. length=1) vector using 16 bits
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="writer"></param>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    public static void WriteNormalizedVector2<T>(this ref T writer, float x, float y)
+        where T : struct, IByteWriter
+    {
+        writer.WriteNormalizedVector2(new Vector2(x, y));
+    }
+
+    public static void ReadNormalizedVector2<T>(this ref T reader, out float x, out float y)
+        where T : struct, IByteReader
+    {
+        var v = reader.ReadNormalizedVector2();
+        x = v.X;
+        y = v.Y;
+    }
+
+
+    /// <summary>
+    /// Write a normalized (i.e. length=1) vector using 64 bits
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="writer"></param>
+    /// <param name="xy"></param>
+    public static void WriteNormalizedVector2<T>(this ref T writer, Vector2 xy)
+        where T : struct, IByteWriter
+    {
+        var atan = MathF.Atan2(xy.Y, xy.X);
+        writer.WriteRangeLimitedFloat16(atan, -MathF.PI, MathF.PI * 2);
+    }
+
+    public static Vector2 ReadNormalizedVector2<T>(this ref T reader)
+        where T : struct, IByteReader
+    {
+        var atan = reader.ReadRangeLimitedFloat16(-MathF.PI, MathF.PI * 2);
+        var x = MathF.Cos(atan);
+        var y = MathF.Sin(atan);
+
+        return new Vector2(x, y);
+    }
+
+
+    /// <summary>
     /// Write a normalized (i.e. length=1) vector using 64 bits
     /// </summary>
     /// <typeparam name="T"></typeparam>
