@@ -266,6 +266,26 @@ public static class Primitives
     }
 
 
+    public static void Write<T>(this ref T writer, char c)
+        where T : struct, IByteWriter
+    {
+        Span<byte> span = stackalloc byte[2];
+        BinaryPrimitives.WriteUInt16BigEndian(span, c);
+
+        writer.Write(span);
+    }
+
+    public static char ReadChar<T>(this ref T reader)
+        where T : struct, IByteReader
+    {
+        Span<byte> span = stackalloc byte[2];
+        reader.ReadBytes(span);
+
+        return (char)BinaryPrimitives.ReadUInt16BigEndian(span);
+    }
+
+
+
     public static void Write<T>(this ref T writer, TimeSpan t)
         where T : struct, IByteWriter
     {

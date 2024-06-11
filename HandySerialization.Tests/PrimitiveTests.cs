@@ -282,5 +282,20 @@ namespace HandySerialization.Tests
                 Assert.AreEqual(input, output);
             }
         }
+
+        [TestMethod]
+        public void RoundTripChar()
+        {
+            for (var i = 0; i <= (int)ushort.MaxValue; i++)
+            {
+                var input = (char)i;
+
+                var serializer = new TestWriterReader();
+                serializer.Write(input);
+                var output = serializer.ReadChar();
+
+                Assert.AreEqual(input, output);
+            }
+        }
     }
 }
