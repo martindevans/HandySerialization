@@ -104,6 +104,45 @@ public static class Floats
         }
     }
 
+    public static SequenceFloat32Reader ReadSequenceFloat32<T>(this ref T reader)
+        where T : struct, IByteReader
+    {
+        return new SequenceFloat32Reader(ReadSequenceLengthFloat32(ref reader));
+    }
+
+    public struct SequenceFloat32Reader
+    {
+        public int Count { get; }
+
+        private int _remaining;
+        private int _prev = 0;
+
+        internal SequenceFloat32Reader(int count)
+        {
+            Count = count;
+            _remaining = count;
+        }
+
+        public bool TryReadNext<T>(ref T reader, out float value)
+            where T : struct, IByteReader
+        {
+            if (_remaining == 0)
+            {
+                value = 0;
+                return false;
+            }
+
+            _remaining--;
+
+            var xor = (int)reader.ReadVariableInt64();
+            var fint = xor ^ _prev;
+            _prev = fint;
+
+            value = BitConverter.Int32BitsToSingle(fint);
+            return true;
+        }
+    }
+
 
     /// <summary>
     /// Write a sequence of doubles, with variable length encoding. For totally uncorrelated data this will make
@@ -145,6 +184,45 @@ public static class Floats
             prev = fint;
 
             dest[i] = BitConverter.Int64BitsToDouble(fint);
+        }
+    }
+
+    public static SequenceFloat64Reader ReadSequenceFloat64<T>(this ref T reader)
+        where T : struct, IByteReader
+    {
+        return new SequenceFloat64Reader(ReadSequenceLengthFloat64(ref reader));
+    }
+
+    public struct SequenceFloat64Reader
+    {
+        public int Count { get; }
+
+        private int _remaining;
+        private long _prev = 0;
+
+        internal SequenceFloat64Reader(int count)
+        {
+            Count = count;
+            _remaining = count;
+        }
+
+        public bool TryReadNext<T>(ref T reader, out double value)
+            where T : struct, IByteReader
+        {
+            if (_remaining == 0)
+            {
+                value = 0;
+                return false;
+            }
+
+            _remaining--;
+
+            var xor = reader.ReadVariableInt64();
+            var fint = xor ^ _prev;
+            _prev = fint;
+
+            value = BitConverter.Int64BitsToDouble(fint);
+            return true;
         }
     }
 }
