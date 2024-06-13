@@ -1,4 +1,5 @@
-﻿using HandySerialization.Extensions;
+﻿using System.Runtime.InteropServices;
+using HandySerialization.Extensions;
 
 namespace HandySerialization.Tests;
 
@@ -101,15 +102,26 @@ public class FloatTests
         }
     }
 
+    private static void CheckCompressionStats<T>(Span<T> sequence, TestWriterReader serializer)
+    {
+        var expected = sequence.Length * Marshal.SizeOf<T>() + 4;
+        var actual = serializer.UnreadBytes;
+        var saved = expected - actual;
+        var factor = actual / (float)expected;
+        Console.WriteLine($"Saved: {saved} ({factor}x)");
+        Assert.IsTrue(expected >= actual - 100);
+    }
+
     [TestMethod]
     public void RoundTripFloatSequenceFloat32()
     {
         var rng = new Random(347245);
 
         const int count = 2500;
+        var sequence = new float[count];
+        var output = new float[count];
         for (var i = 0; i < count; i++)
         {
-            var sequence = new float[count];
             for (var j = 0; j < sequence.Length; j++)
             {
                 if (j == 0)
@@ -122,54 +134,10 @@ public class FloatTests
 
             serializer.WriteSequenceFloat32(sequence);
 
-            var expected = sequence.Length * 4 + 4;
-            var actual = serializer.UnreadBytes;
-            var saved = expected - actual;
-            var factor = actual / (float)expected;
-            Console.WriteLine($"Saved: {saved} ({factor}x)");
-            Assert.IsTrue(expected >= actual - 100);
-
-            var length = serializer.ReadSequenceLengthFloat32();
-            var output = new float[length];
-            serializer.ReadSequenceValuesFloat32(output);
-
-            Assert.IsTrue(sequence.SequenceEqual(output));
-        }
-    }
-
-    [TestMethod]
-    public void RoundTripFloatSequenceFloat32_Incremental()
-    {
-        var rng = new Random(347245);
-
-        const int count = 2500;
-        for (var i = 0; i < count; i++)
-        {
-            var sequence = new float[count];
-            for (var j = 0; j < sequence.Length; j++)
-            {
-                if (j == 0)
-                    sequence[j] = (rng.NextSingle() - 0.5f) * 1_000_000;
-                else
-                    sequence[j] = sequence[j - 1] + (rng.NextSingle() - 0.5f) * 1_000f;
-            }
-
-            var serializer = new TestWriterReader();
-
-            serializer.WriteSequenceFloat32(sequence);
-
-            var expected = sequence.Length * 4 + 4;
-            var actual = serializer.UnreadBytes;
-            var saved = expected - actual;
-            var factor = actual / (float)expected;
-            Console.WriteLine($"Saved: {saved} ({factor}x)");
-            Assert.IsTrue(expected >= actual - 100);
+            CheckCompressionStats<float>(sequence, serializer);
 
             var seq = serializer.ReadSequenceFloat32();
-            var output = new float[seq.Count];
-            var idx = 0;
-            while (seq.TryReadNext(ref serializer, out var value))
-                output[idx++] = value;
+            seq.Read(ref serializer, output);
 
             Assert.IsTrue(sequence.SequenceEqual(output));
         }
@@ -181,9 +149,10 @@ public class FloatTests
         var rng = new Random(347245);
 
         const int count = 2500;
+        var sequence = new double[count];
+        var output = new double[count];
         for (var i = 0; i < count; i++)
         {
-            var sequence = new double[count];
             for (var j = 0; j < sequence.Length; j++)
             {
                 if (j == 0)
@@ -196,54 +165,134 @@ public class FloatTests
 
             serializer.WriteSequenceFloat64(sequence);
 
-            var expected = sequence.Length * 8 + 4;
-            var actual = serializer.UnreadBytes;
-            var saved = expected - actual;
-            var factor = actual / (float)expected;
-            Console.WriteLine($"Saved: {saved} ({factor}x)");
-            Assert.IsTrue(expected >= actual - 200);
+            CheckCompressionStats<double>(sequence, serializer);
 
-            var length = serializer.ReadSequenceLengthFloat64();
-            var output = new double[length];
-            serializer.ReadSequenceValuesFloat64(output);
+            var seq = serializer.ReadSequenceFloat64();
+            seq.Read(ref serializer, output);
 
             Assert.IsTrue(sequence.SequenceEqual(output));
         }
     }
 
     [TestMethod]
-    public void RoundTripFloatSequenceFloat64_Incremental()
+    public void RoundTripFloatSequenceInt32()
     {
         var rng = new Random(347245);
 
         const int count = 2500;
+        var sequence = new int[count];
+        var output = new int[count];
         for (var i = 0; i < count; i++)
         {
-            var sequence = new double[count];
             for (var j = 0; j < sequence.Length; j++)
             {
                 if (j == 0)
-                    sequence[j] = (rng.NextDouble() - 0.5) * 1_000_000;
+                    sequence[j] = rng.Next();
                 else
-                    sequence[j] = sequence[j - 1] + (rng.NextDouble() - 0.5) * 1_000;
+                    sequence[j] = sequence[j - 1] + rng.Next(-1048576, 1048576);
             }
 
             var serializer = new TestWriterReader();
 
-            serializer.WriteSequenceFloat64(sequence);
+            serializer.WriteSequenceInt32(sequence);
 
-            var expected = sequence.Length * 8 + 4;
-            var actual = serializer.UnreadBytes;
-            var saved = expected - actual;
-            var factor = actual / (float)expected;
-            Console.WriteLine($"Saved: {saved} ({factor}x)");
-            Assert.IsTrue(expected >= actual - 200);
+            CheckCompressionStats<int>(sequence, serializer);
 
-            var seq = serializer.ReadSequenceFloat64();
-            var output = new double[seq.Count];
-            var idx = 0;
-            while (seq.TryReadNext(ref serializer, out var value))
-                output[idx++] = value;
+            var seq = serializer.ReadSequenceInt32();
+            seq.Read(ref serializer, output);
+
+            Assert.IsTrue(sequence.SequenceEqual(output));
+        }
+    }
+
+    [TestMethod]
+    public void RoundTripFloatSequenceUInt32()
+    {
+        var rng = new Random(347245);
+
+        const int count = 2500;
+        var sequence = new uint[count];
+        var output = new uint[count];
+        for (var i = 0; i < count; i++)
+        {
+            for (var j = 0; j < sequence.Length; j++)
+            {
+                if (j == 0)
+                    sequence[j] = unchecked((uint)rng.Next());
+                else
+                    sequence[j] = unchecked((uint)sequence[j - 1] + (uint)rng.Next(0, 1048576));
+            }
+
+            var serializer = new TestWriterReader();
+
+            serializer.WriteSequenceUInt32(sequence);
+
+            CheckCompressionStats<uint>(sequence, serializer);
+
+            var seq = serializer.ReadSequenceUInt32();
+            seq.Read(ref serializer, output);
+
+            Assert.IsTrue(sequence.SequenceEqual(output));
+        }
+    }
+
+    [TestMethod]
+    public void RoundTripFloatSequenceInt64()
+    {
+        var rng = new Random(98457);
+
+        const int count = 2500;
+        var sequence = new long[count];
+        var output = new long[count];
+        for (var i = 0; i < count; i++)
+        {
+            for (var j = 0; j < sequence.Length; j++)
+            {
+                if (j == 0)
+                    sequence[j] = rng.Next();
+                else
+                    sequence[j] = sequence[j - 1] + rng.NextInt64(-4294967296, 4294967296);
+            }
+
+            var serializer = new TestWriterReader();
+
+            serializer.WriteSequenceInt64(sequence);
+
+            CheckCompressionStats<long>(sequence, serializer);
+
+            var seq = serializer.ReadSequenceInt64();
+            seq.Read(ref serializer, output);
+
+            Assert.IsTrue(sequence.SequenceEqual(output));
+        }
+    }
+
+    [TestMethod]
+    public void RoundTripFloatSequenceUInt64()
+    {
+        var rng = new Random(98457);
+
+        const int count = 2500;
+        var sequence = new ulong[count];
+        var output = new ulong[count];
+        for (var i = 0; i < count; i++)
+        {
+            for (var j = 0; j < sequence.Length; j++)
+            {
+                if (j == 0)
+                    sequence[j] = unchecked((ulong)rng.NextInt64());
+                else
+                    sequence[j] = unchecked(sequence[j - 1] + (ulong)rng.NextInt64(0, 4294967296));
+            }
+
+            var serializer = new TestWriterReader();
+
+            serializer.WriteSequenceUInt64(sequence);
+
+            CheckCompressionStats<ulong>(sequence, serializer);
+
+            var seq = serializer.ReadSequenceUInt64();
+            seq.Read(ref serializer, output);
 
             Assert.IsTrue(sequence.SequenceEqual(output));
         }

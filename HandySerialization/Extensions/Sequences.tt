@@ -1,0 +1,184 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+
+namespace HandySerialization.Extensions;
+
+<# var configs = new[] {
+    new Config { 
+        Type = typeof(float),
+        TypeAlias = "float",
+
+        IntType = typeof(int),
+        IntAlias = "int",
+        
+        Name = "Float32",
+        ConvToInt = "BitConverter.SingleToInt32Bits",
+        ConvToType = "BitConverter.Int32BitsToSingle"
+    },
+    new Config { 
+        Type = typeof(double),
+        TypeAlias = "double",
+
+        IntType = typeof(long),
+        IntAlias = "long",
+        
+        Name = "Float64",
+        ConvToInt = "BitConverter.DoubleToInt64Bits",
+        ConvToType = "BitConverter.Int64BitsToDouble"
+    },
+
+    new Config { 
+        Type = typeof(int),
+        TypeAlias = "int",
+
+        IntType = typeof(int),
+        IntAlias = "int",
+        
+        Name = "Int32",
+        ConvToInt = "",
+        ConvToType = ""
+    },
+    new Config { 
+        Type = typeof(uint),
+        TypeAlias = "uint",
+
+        IntType = typeof(uint),
+        IntAlias = "uint",
+        
+        Name = "UInt32",
+        Unsigned = true,
+        ConvToInt = "",
+        ConvToType = ""
+    },
+    new Config { 
+        Type = typeof(long),
+        TypeAlias = "long",
+
+        IntType = typeof(long),
+        IntAlias = "long",
+        
+        Name = "Int64",
+        ConvToInt = "",
+        ConvToType = ""
+    },
+    new Config { 
+        Type = typeof(ulong),
+        TypeAlias = "ulong",
+
+        IntType = typeof(ulong),
+        IntAlias = "ulong",
+        
+        Name = "UInt64",
+        Unsigned = true,
+        ConvToInt = "",
+        ConvToType = ""
+    },
+}; #>
+
+public static class Sequences
+{
+<#
+	foreach (var config in configs)
+    {
+        var input = config.TypeAlias + "s";
+        var readerType = $"Sequence{config.Name}Reader";
+#>
+    /// <summary>
+    /// Write a sequence of <#=config.TypeAlias#>s, with variable length encoding. For totally uncorrelated data this will make
+    /// the output data about 1.2x <b>larger</b>! However if the data are correlated (e.g. with ~1,000,000 of each other)
+    /// then this will save be about 0.85x **smaller**.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="writer"></param>
+    /// <param name="<#=input#>"></param>
+    public static void WriteSequence<#=config.Name#><T>(this ref T writer, ReadOnlySpan<<#=config.TypeAlias#>> <#=input#>)
+        where T : struct, IByteWriter
+    {
+        writer.WriteVariableUInt64((ulong)<#=input#>.Length);
+
+        <#=config.IntAlias#> prev = 0;
+        for (var i = 0; i < <#=input#>.Length; i++)
+        {
+            <#=config.IntAlias#> fint = <#=config.ConvToInt#>(<#=input#>[i]);
+            var xor = fint ^ prev;
+            prev = fint;
+<# if (config.Unsigned) { #>
+            writer.WriteVariableUInt64(xor);
+<# } else { #>
+            writer.WriteVariableInt64(xor);
+<# } #>
+        }
+    }
+
+    public static <#=readerType#><T> ReadSequence<#=config.Name#><T>(this ref T reader)
+        where T : struct, IByteReader
+    {
+        return new <#=readerType#><T>((int)reader.ReadVariableUInt64());
+    }
+
+    public struct <#=readerType#><T>
+        where T : struct, IByteReader
+    {
+        public int Remaining { get; private set; }
+
+        private <#=config.IntAlias#> _prev = 0;
+
+        internal <#=readerType#>(int count)
+        {
+            Remaining = count;
+        }
+
+        /// <summary>
+        /// Read as many values as possible into the given span. Span must be less than or equal to Remaining values count
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="dest"></param>
+        public void Read(ref T reader, Span<<#=config.TypeAlias#>> dest)
+        {
+            if (dest.Length > Remaining)
+                throw new InvalidOperationException($"Cannot read {dest.Length} values, only {Remaining} values are left to read");
+
+            Remaining -= dest.Length;
+            for (var i = 0; i < dest.Length; i++)
+            {
+                var xor = (<#=config.IntAlias#>)
+<# if (config.Unsigned) { #>
+                    reader.ReadVariableUInt64();
+<# } else { #>
+                    reader.ReadVariableInt64();
+<# } #>
+
+                //var xor = (<#=config.IntAlias#>)reader.ReadVariableInt64();
+                var fint = xor ^ _prev;
+                _prev = fint;
+
+                dest[i] = <#=config.ConvToType#>(fint);
+            }
+        }
+    }
+
+<#
+    }
+#>
+}
+
+<#+
+public record class Config
+{
+    public Type Type { get; set; }
+    public string TypeAlias { get; set; }
+
+    public Type IntType { get; set; }
+    public string IntAlias { get; set; }
+
+    public bool Unsigned { get; set; }
+
+    public string Name { get; set; }
+    public string ConvToInt { get; set; }
+    public string ConvToType { get; set; }
+};
+#>
