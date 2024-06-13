@@ -1,5 +1,6 @@
 using HandySerialization.Extensions;
 using System.Numerics;
+using HandySerialization.Extensions.Lossy;
 
 namespace HandySerialization.Tests
 {
@@ -68,6 +69,19 @@ namespace HandySerialization.Tests
         }
 
         [TestMethod]
+        public void CompressedQuaternionRoundTripIdentity()
+        {
+            // Check that the identity quaternion is perfectly round tripped.
+
+            var qin = Quaternion.Identity;
+            var serializer = new TestWriterReader();
+            serializer.WriteCompressedQuaternion(qin);
+            var qout = serializer.ReadCompressedQuaternion();
+
+            Assert.AreEqual(qin, qout);
+        }
+
+        [TestMethod]
         public void CompressedQuaternionRoundTrip()
         {
             var rng = new Random(3572456);
@@ -120,10 +134,35 @@ namespace HandySerialization.Tests
                 var qin = Quaternion.CreateFromAxisAngle(axis, angle);
 
                 serializer.Write(qin);
+                Console.WriteLine(serializer.UnreadBytes);
                 var qout = serializer.ReadQuaternion();
                 Assert.AreEqual(0, serializer.UnreadBytes);
 
                 Assert.AreEqual(qin, qout);
+            }
+        }
+
+        [TestMethod]
+        public void MatrixRoundTrip()
+        {
+            var rng = new Random(5683456);
+
+            const int count = 1_000_000;
+            for (var i = 0; i < count; i++)
+            {
+                var serializer = new TestWriterReader();
+
+                var axis = Vector3.Normalize(new Vector3(rng.NextSingle() * 2 - 1, rng.NextSingle() * 2 - 1, rng.NextSingle() * 2 - 1));
+                var angle = rng.NextSingle() * (float)Math.PI * 2;
+                var min = Matrix4x4.CreateFromQuaternion(Quaternion.CreateFromAxisAngle(axis, angle))
+                    * Matrix4x4.CreateTranslation(rng.NextSingle() * 1, rng.NextSingle() * 1, rng.NextSingle() * 1);
+
+                serializer.Write(min);
+                Console.WriteLine(serializer.UnreadBytes);
+                var mout = serializer.ReadMatrix4x4();
+                Assert.AreEqual(0, serializer.UnreadBytes);
+
+                Assert.AreEqual(min, mout);
             }
         }
     }

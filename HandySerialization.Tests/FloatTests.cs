@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using HandySerialization.Extensions;
+using HandySerialization.Extensions.Lossy;
 
 namespace HandySerialization.Tests;
 
@@ -132,11 +133,11 @@ public class FloatTests
 
             var serializer = new TestWriterReader();
 
-            serializer.WriteSequenceFloat32(sequence);
+            serializer.WriteCompressedLengthPrefixedSequenceFloat32(sequence);
 
             CheckCompressionStats<float>(sequence, serializer);
 
-            var seq = serializer.ReadSequenceFloat32();
+            var seq = serializer.ReadCompressedLengthPrefixedSequenceFloat32();
             seq.Read(ref serializer, output);
 
             Assert.IsTrue(sequence.SequenceEqual(output));
@@ -163,11 +164,11 @@ public class FloatTests
 
             var serializer = new TestWriterReader();
 
-            serializer.WriteSequenceFloat64(sequence);
+            serializer.WriteCompressedLengthPrefixedSequenceFloat64(sequence);
 
             CheckCompressionStats<double>(sequence, serializer);
 
-            var seq = serializer.ReadSequenceFloat64();
+            var seq = serializer.ReadCompressedLengthPrefixedSequenceFloat64();
             seq.Read(ref serializer, output);
 
             Assert.IsTrue(sequence.SequenceEqual(output));
@@ -194,11 +195,11 @@ public class FloatTests
 
             var serializer = new TestWriterReader();
 
-            serializer.WriteSequenceInt32(sequence);
+            serializer.WriteCompressedLengthPrefixedSequenceInt32(sequence);
 
             CheckCompressionStats<int>(sequence, serializer);
 
-            var seq = serializer.ReadSequenceInt32();
+            var seq = serializer.ReadCompressedLengthPrefixedSequenceInt32();
             seq.Read(ref serializer, output);
 
             Assert.IsTrue(sequence.SequenceEqual(output));
@@ -225,11 +226,11 @@ public class FloatTests
 
             var serializer = new TestWriterReader();
 
-            serializer.WriteSequenceUInt32(sequence);
+            serializer.WriteCompressedLengthPrefixedSequenceUInt32(sequence);
 
             CheckCompressionStats<uint>(sequence, serializer);
 
-            var seq = serializer.ReadSequenceUInt32();
+            var seq = serializer.ReadCompressedLengthPrefixedSequenceUInt32();
             seq.Read(ref serializer, output);
 
             Assert.IsTrue(sequence.SequenceEqual(output));
@@ -256,11 +257,11 @@ public class FloatTests
 
             var serializer = new TestWriterReader();
 
-            serializer.WriteSequenceInt64(sequence);
+            serializer.WriteCompressedLengthPrefixedSequenceInt64(sequence);
 
             CheckCompressionStats<long>(sequence, serializer);
 
-            var seq = serializer.ReadSequenceInt64();
+            var seq = serializer.ReadCompressedLengthPrefixedSequenceInt64();
             seq.Read(ref serializer, output);
 
             Assert.IsTrue(sequence.SequenceEqual(output));
@@ -287,11 +288,11 @@ public class FloatTests
 
             var serializer = new TestWriterReader();
 
-            serializer.WriteSequenceUInt64(sequence);
+            serializer.WriteCompressedLengthPrefixedSequenceUInt64(sequence);
 
             CheckCompressionStats<ulong>(sequence, serializer);
 
-            var seq = serializer.ReadSequenceUInt64();
+            var seq = serializer.ReadCompressedLengthPrefixedSequenceUInt64();
             seq.Read(ref serializer, output);
 
             Assert.IsTrue(sequence.SequenceEqual(output));

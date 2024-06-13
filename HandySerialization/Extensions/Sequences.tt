@@ -54,6 +54,7 @@ namespace HandySerialization.Extensions;
         ConvToInt = "",
         ConvToType = ""
     },
+
     new Config { 
         Type = typeof(long),
         TypeAlias = "long",
@@ -88,18 +89,16 @@ public static class Sequences
         var readerType = $"Sequence{config.Name}Reader";
 #>
     /// <summary>
-    /// Write a sequence of <#=config.TypeAlias#>s, with variable length encoding. For totally uncorrelated data this will make
-    /// the output data about 1.2x <b>larger</b>! However if the data are correlated (e.g. with ~1,000,000 of each other)
-    /// then this will save be about 0.85x **smaller**.
+    /// Write a sequence of <#=config.TypeAlias#>s with a fixed length (length must be known by reader) using variable length encoding. For
+    /// totally uncorrelated data this will make the output data about 1.2x <b>larger</b>! However if the data are correlated
+    /// (e.g. with ~1,000,000 of each other) then this will be about 0.85x **smaller**.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="<#=input#>"></param>
-    public static void WriteSequence<#=config.Name#><T>(this ref T writer, ReadOnlySpan<<#=config.TypeAlias#>> <#=input#>)
+    public static void WriteCompressedSequence<#=config.Name#><T>(this ref T writer, ReadOnlySpan<<#=config.TypeAlias#>> <#=input#>)
         where T : struct, IByteWriter
     {
-        writer.WriteVariableUInt64((ulong)<#=input#>.Length);
-
         <#=config.IntAlias#> prev = 0;
         for (var i = 0; i < <#=input#>.Length; i++)
         {
@@ -114,7 +113,29 @@ public static class Sequences
         }
     }
 
-    public static <#=readerType#><T> ReadSequence<#=config.Name#><T>(this ref T reader)
+    public static void ReadCompressedSequence<#=config.Name#><T>(this ref T reader, Span<<#=config.TypeAlias#>> output)
+        where T : struct, IByteReader
+    {
+        var r = new <#=readerType#><T>(output.Length);
+        r.Read(ref reader, output);
+    }
+
+    /// <summary>
+    /// Write a sequence of <#=config.TypeAlias#>s, with variable length encoding. For totally uncorrelated data this will make
+    /// the output data about 1.2x <b>larger</b>! However if the data are correlated (e.g. with ~1,000,000 of each other)
+    /// then this will save be about 0.85x **smaller**.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="writer"></param>
+    /// <param name="<#=input#>"></param>
+    public static void WriteCompressedLengthPrefixedSequence<#=config.Name#><T>(this ref T writer, ReadOnlySpan<<#=config.TypeAlias#>> <#=input#>)
+        where T : struct, IByteWriter
+    {
+        writer.WriteVariableUInt64((ulong)<#=input#>.Length);
+        writer.WriteCompressedSequence<#=config.Name#>(<#=input#>);
+    }
+
+    public static <#=readerType#><T> ReadCompressedLengthPrefixedSequence<#=config.Name#><T>(this ref T reader)
         where T : struct, IByteReader
     {
         return new <#=readerType#><T>((int)reader.ReadVariableUInt64());
@@ -145,14 +166,12 @@ public static class Sequences
             Remaining -= dest.Length;
             for (var i = 0; i < dest.Length; i++)
             {
-                var xor = (<#=config.IntAlias#>)
 <# if (config.Unsigned) { #>
-                    reader.ReadVariableUInt64();
+                var xor = (<#=config.IntAlias#>)reader.ReadVariableUInt64();
 <# } else { #>
-                    reader.ReadVariableInt64();
+                var xor = (<#=config.IntAlias#>)reader.ReadVariableInt64();
 <# } #>
 
-                //var xor = (<#=config.IntAlias#>)reader.ReadVariableInt64();
                 var fint = xor ^ _prev;
                 _prev = fint;
 

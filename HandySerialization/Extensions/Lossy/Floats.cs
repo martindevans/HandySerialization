@@ -1,5 +1,4 @@
-﻿
-namespace HandySerialization.Extensions;
+﻿namespace HandySerialization.Extensions.Lossy;
 
 public static class Floats
 {
