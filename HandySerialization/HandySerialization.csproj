@@ -8,6 +8,12 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Version>6.0.0</Version>
+    <Title>Handy Serialization</Title>
+    <Authors>Martin Evans</Authors>
+    <Description>HandySerializtion is a simple serialization library.</Description>
+    <PackageProjectUrl>https://github.com/martindevans/HandySerialization</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/martindevans/HandySerialization</RepositoryUrl>
+    <PackageTags>games, serialization, binary</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

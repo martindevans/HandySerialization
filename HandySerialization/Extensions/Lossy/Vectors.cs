@@ -28,7 +28,7 @@ public static class Vectors
 
 
     /// <summary>
-    /// Write a normalized (i.e. length=1) vector using 64 bits
+    /// Write a normalized (i.e. length=1) vector using 16 bits
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>

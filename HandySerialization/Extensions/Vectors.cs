@@ -1,6 +1,5 @@
 ﻿using System.Numerics;
 using System.Runtime.InteropServices;
-using HandySerialization.Extensions.Lossy;
 
 namespace HandySerialization.Extensions;
 
