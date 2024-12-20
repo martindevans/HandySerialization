@@ -30,6 +30,24 @@ namespace HandySerialization.Tests
         }
 
         [TestMethod]
+        public void RoundTripNullString()
+        {
+            var serializer = new TestWriterReader();
+
+            serializer.Write((string?)null);
+            Assert.AreEqual(null, serializer.ReadString());
+        }
+
+        [TestMethod]
+        public void RoundTripEmptyString()
+        {
+            var serializer = new TestWriterReader();
+
+            serializer.Write("");
+            Assert.AreEqual("", serializer.ReadString());
+        }
+
+        [TestMethod]
         public void RoundTripBool8()
         {
             var rng = new Random(49087);

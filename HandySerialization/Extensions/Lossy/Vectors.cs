@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using System.Runtime.InteropServices;
 
 namespace HandySerialization.Extensions.Lossy;
 
@@ -146,7 +145,7 @@ public static class Vectors
         // 5:      Sign of X (1 = negative)
         // 4:      Sign of Y (1 = negative)
         // 3:      Sign of Z (1 = negative)
-        // 2:      Indicates if the output should be an identity quaternion
+        // 2:      Indicates if the output should be an identity quaternion (all other flags ignored if set)
         // 1:      Unused
         var flags = 0;
 

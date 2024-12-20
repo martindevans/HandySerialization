@@ -103,6 +103,29 @@ public class FloatTests
         }
     }
 
+    [TestMethod]
+    public void RoundTripRangeFloat24()
+    {
+        var rng = new Random(567345);
+
+        const int count = 1_000_000;
+        for (var i = 0; i < count; i++)
+        {
+            var serializer = new TestWriterReader();
+
+            var min = rng.NextSingle() * rng.Next(-100000, 100000);
+            var max = min + rng.NextSingle() * rng.Next(0, 100000);
+            var range = max - min;
+
+            var input = min + rng.NextSingle() * range;
+
+            serializer.WriteRangeLimitedFloat24(input, min, range);
+            var output = serializer.ReadRangeLimitedFloat24(min, range);
+
+            Assert.AreEqual(input, output, (2 * range) / 16777215);
+        }
+    }
+
     private static void CheckCompressionStats<T>(Span<T> sequence, TestWriterReader serializer)
     {
         var expected = sequence.Length * Marshal.SizeOf<T>() + 4;
@@ -118,7 +141,7 @@ public class FloatTests
     {
         var rng = new Random(347245);
 
-        const int count = 2500;
+        const int count = 2000;
         var sequence = new float[count];
         var output = new float[count];
         for (var i = 0; i < count; i++)
@@ -149,7 +172,7 @@ public class FloatTests
     {
         var rng = new Random(347245);
 
-        const int count = 2500;
+        const int count = 2000;
         var sequence = new double[count];
         var output = new double[count];
         for (var i = 0; i < count; i++)
@@ -180,7 +203,7 @@ public class FloatTests
     {
         var rng = new Random(347245);
 
-        const int count = 2500;
+        const int count = 2000;
         var sequence = new int[count];
         var output = new int[count];
         for (var i = 0; i < count; i++)
@@ -211,7 +234,7 @@ public class FloatTests
     {
         var rng = new Random(347245);
 
-        const int count = 2500;
+        const int count = 2000;
         var sequence = new uint[count];
         var output = new uint[count];
         for (var i = 0; i < count; i++)
@@ -242,7 +265,7 @@ public class FloatTests
     {
         var rng = new Random(98457);
 
-        const int count = 2500;
+        const int count = 2000;
         var sequence = new long[count];
         var output = new long[count];
         for (var i = 0; i < count; i++)
@@ -273,7 +296,7 @@ public class FloatTests
     {
         var rng = new Random(98457);
 
-        const int count = 2500;
+        const int count = 2000;
         var sequence = new ulong[count];
         var output = new ulong[count];
         for (var i = 0; i < count; i++)

@@ -228,12 +228,21 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this ref T writer, string str)
+    public static void Write<T>(this ref T writer, string? str)
         where T : struct, IByteWriter
     {
-        var byteCount = Encoding.UTF8.GetByteCount(str);
-        writer.WriteVariableUInt64((uint)byteCount);
+        // Use 0 to indicate a null string
+        if (str == null)
+        {
+            writer.WriteVariableUInt64((uint)0);
+            return;
+        }
 
+        // We already used zero to indicate null, write out the length + 1
+        var byteCount = Encoding.UTF8.GetByteCount(str);
+        writer.WriteVariableUInt64((uint)(byteCount + 1));
+
+        // Write out the bytes
         var bytes = ArrayPool<byte>.Shared.Rent(byteCount);
         try
         {
@@ -246,10 +255,14 @@ public static class Primitives
         }
     }
 
-    public static string ReadString<T>(this ref T reader)
+    public static string? ReadString<T>(this ref T reader)
         where T : struct, IByteReader
     {
         var byteCount = (int)reader.ReadVariableUInt64();
+        if (byteCount == 0)
+            return null;
+
+        byteCount--;
         if (byteCount == 0)
             return "";
 
