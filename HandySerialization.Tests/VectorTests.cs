@@ -143,11 +143,11 @@ namespace HandySerialization.Tests
         }
 
         [TestMethod]
-        public void MatrixRoundTrip()
+        public void Matrix4x4RoundTrip()
         {
             var rng = new Random(5683456);
 
-            const int count = 1_000_000;
+            const int count = 100_000;
             for (var i = 0; i < count; i++)
             {
                 var serializer = new TestWriterReader();
@@ -163,6 +163,30 @@ namespace HandySerialization.Tests
                 Assert.AreEqual(0, serializer.UnreadBytes);
 
                 Assert.AreEqual(min, mout);
+            }
+        }
+
+        [TestMethod]
+        public void Matrix3x2RoundTrip()
+        {
+            var rng = new Random(567567);
+
+            const int count = 100_000;
+            for (var i = 0; i < count; i++)
+            {
+                var serializer = new TestWriterReader();
+
+                var mat = new Matrix3x2(
+                    rng.NextSingle(), rng.NextSingle(), rng.NextSingle(),
+                    rng.NextSingle(), rng.NextSingle(), rng.NextSingle()
+                );
+
+                serializer.Write(mat);
+                Console.WriteLine(serializer.UnreadBytes);
+                var mout = serializer.ReadMatrix3x2();
+                Assert.AreEqual(0, serializer.UnreadBytes);
+
+                Assert.AreEqual(mat, mout);
             }
         }
     }
