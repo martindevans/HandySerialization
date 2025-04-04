@@ -1,0 +1,100 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+
+using HandySerialization.Wrappers;
+
+namespace HandySerialization.Extensions.Bits;
+
+public static class SmallIntExtensions
+{
+<# for (var nbits = 2; nbits < 32; nbits++) { #>
+	/// <summary>
+    /// Write an int with <#= nbits #> bits
+    /// </summary>
+    /// <typeparam name="TBytes"></typeparam>
+    /// <param name="writer"></param>
+    /// <param name="value"></param>
+    public static void WriteUInt<#= nbits #><TBytes>(ref this BitWriter<TBytes> writer, uint value)
+        where TBytes : struct, IByteWriter
+    {
+<# for (var i = 0; i < nbits; i++) { #>
+        writer.Write((value & <#= SingleBitMask(i, nbits) #>) == <#= SingleBitMask(i, nbits) #>);
+<# } #>
+    }
+
+    public static uint ReadUInt<#= nbits #><TBytes>(ref this BitReader<TBytes> reader)
+        where TBytes : struct, IByteReader
+    {
+        return (reader.Read() ? <#= SingleBitMask(0, nbits) #> : 0)
+<# for (var i = 1; i < nbits; i++) { #>
+             | (reader.Read() ? <#= SingleBitMask(i, nbits) #> : 0)
+<# } #>
+             ;
+    }
+
+<# } #>
+    /// <summary>
+    /// Write an int with a specific number of bits
+    /// </summary>
+    /// <typeparam name="TBytes"></typeparam>
+    /// <param name="writer"></param>
+    /// <param name="value"></param>
+    /// <param name="bits"></param>
+    public static void WriteSmallUInt<TBytes>(ref this BitWriter<TBytes> writer, uint value, uint bits)
+        where TBytes : struct, IByteWriter
+    {
+        for (var i = 0; i < bits; i++)
+        {
+            writer.Write((value & 0b1) == 1);
+            value >>= 1;
+        }
+    }
+
+    public static uint ReadSmallUInt<TBytes>(ref this BitReader<TBytes> reader, uint bits)
+        where TBytes : struct, IByteReader
+    {
+        var value = 0u;
+
+        for (var i = 0; i < bits; i++)
+            value |= reader.Read() ? 1u << i : 0u;
+
+        return value;
+    }
+
+    /// <summary>
+    /// Write a number as N zeroes, followed by a one
+    /// </summary>
+    /// <typeparam name="TBytes"></typeparam>
+    /// <param name="writer"></param>
+    /// <param name="value"></param>
+    public static void WriteUnaryInt<TBytes>(ref this BitWriter<TBytes> writer, byte value)
+        where TBytes : struct, IByteWriter
+    {
+        for (var i = 0; i < value; i++)
+            writer.Write(false);
+        writer.Write(true);
+    }
+
+    public static byte ReadUnaryInt<TBytes>(ref this BitReader<TBytes> reader)
+        where TBytes : struct, IByteReader
+    {
+        var count = 0;
+        while (!reader.Read())
+            count++;
+        return (byte)count;
+    }
+}
+
+<#+
+public static string SingleBitMask(int bit, int total)
+{
+    var pz = Math.Max(0, total - bit - 1);
+    var prefix = new string('0', pz);
+
+    return "0b" + prefix + "1" + new string('0', bit) + "u";
+}
+#>

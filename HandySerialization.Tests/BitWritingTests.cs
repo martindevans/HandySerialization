@@ -1,4 +1,4 @@
-﻿using HandySerialization.Extensions;
+﻿using HandySerialization.Extensions.Bits;
 using HandySerialization.Wrappers;
 
 namespace HandySerialization.Tests;
@@ -12,10 +12,10 @@ public class BitWritingTests
         var mem = new MemoryStream();
         var byteWriter = new StreamByteWriter(mem);
         var bitWriter = new BitWriter<StreamByteWriter>(byteWriter);
-        bitWriter.WriteInt2(0);
-        bitWriter.WriteInt2(1);
-        bitWriter.WriteInt2(2);
-        bitWriter.WriteInt2(3);
+        bitWriter.WriteUInt2(0);
+        bitWriter.WriteUInt2(1);
+        bitWriter.WriteUInt2(2);
+        bitWriter.WriteUInt2(3);
         bitWriter.Flush();
 
         Assert.AreEqual(1, mem.Length);
@@ -23,10 +23,41 @@ public class BitWritingTests
 
         var byteReader = new StreamByteReader(mem);
         var bitReader = new BitReader<StreamByteReader>(byteReader);
-        Assert.AreEqual(0u, bitReader.ReadInt2());
-        Assert.AreEqual(1u, bitReader.ReadInt2());
-        Assert.AreEqual(2u, bitReader.ReadInt2());
-        Assert.AreEqual(3u, bitReader.ReadInt2());
+        Assert.AreEqual(0u, bitReader.ReadUInt2());
+        Assert.AreEqual(1u, bitReader.ReadUInt2());
+        Assert.AreEqual(2u, bitReader.ReadUInt2());
+        Assert.AreEqual(3u, bitReader.ReadUInt2());
+    }
+
+    [TestMethod]
+    public void RoundtripInt3()
+    {
+        var mem = new MemoryStream();
+        var byteWriter = new StreamByteWriter(mem);
+        var bitWriter = new BitWriter<StreamByteWriter>(byteWriter);
+        bitWriter.WriteUInt3(0);
+        bitWriter.WriteUInt3(1);
+        bitWriter.WriteUInt3(2);
+        bitWriter.WriteUInt3(3);
+        bitWriter.WriteUInt3(4);
+        bitWriter.WriteUInt3(5);
+        bitWriter.WriteUInt3(6);
+        bitWriter.WriteUInt3(7);
+        bitWriter.Flush();
+
+        Assert.AreEqual(3, mem.Length);
+        mem.Position = 0;
+
+        var byteReader = new StreamByteReader(mem);
+        var bitReader = new BitReader<StreamByteReader>(byteReader);
+        Assert.AreEqual(0u, bitReader.ReadUInt3());
+        Assert.AreEqual(1u, bitReader.ReadUInt3());
+        Assert.AreEqual(2u, bitReader.ReadUInt3());
+        Assert.AreEqual(3u, bitReader.ReadUInt3());
+        Assert.AreEqual(4u, bitReader.ReadUInt3());
+        Assert.AreEqual(5u, bitReader.ReadUInt3());
+        Assert.AreEqual(6u, bitReader.ReadUInt3());
+        Assert.AreEqual(7u, bitReader.ReadUInt3());
     }
 
     [TestMethod]
@@ -35,9 +66,9 @@ public class BitWritingTests
         var mem = new MemoryStream();
         var byteWriter = new StreamByteWriter(mem);
         var bitWriter = new BitWriter<StreamByteWriter>(byteWriter);
-        bitWriter.WriteSmallInt(12, 4);
-        bitWriter.WriteSmallInt(1111, 12);
-        bitWriter.WriteSmallInt(7, 3);
+        bitWriter.WriteSmallUInt(12, 4);
+        bitWriter.WriteSmallUInt(1111, 12);
+        bitWriter.WriteSmallUInt(7, 3);
         bitWriter.Flush();
 
         Assert.AreEqual(3, mem.Length);
@@ -45,9 +76,9 @@ public class BitWritingTests
 
         var byteReader = new StreamByteReader(mem);
         var bitReader = new BitReader<StreamByteReader>(byteReader);
-        Assert.AreEqual(12u, bitReader.ReadSmallInt(4));
-        Assert.AreEqual(1111u, bitReader.ReadSmallInt(12));
-        Assert.AreEqual(7u, bitReader.ReadSmallInt(3));
+        Assert.AreEqual(12u, bitReader.ReadSmallUInt(4));
+        Assert.AreEqual(1111u, bitReader.ReadSmallUInt(12));
+        Assert.AreEqual(7u, bitReader.ReadSmallUInt(3));
     }
 
     [TestMethod]
@@ -83,5 +114,57 @@ public class BitWritingTests
         var byteReader = new StreamByteReader(mem);
         var bitReader = new BitReader<StreamByteReader>(byteReader);
         Assert.AreEqual(12u, bitReader.ReadRiceCode32(4));
+    }
+
+    [TestMethod]
+    public void RoundtripEliasGamma()
+    {
+        var mem = new MemoryStream();
+        var byteWriter = new StreamByteWriter(mem);
+        var bitWriter = new BitWriter<StreamByteWriter>(byteWriter);
+
+        const int seed = 234235;
+        const int count = 100_000;
+
+        var rng = new Random(seed);
+        for (long i = 0; i < count; i++)
+            bitWriter.WriteEliasGamma32((uint)rng.NextInt64(0, uint.MaxValue));
+        bitWriter.Flush();
+
+        Console.WriteLine(mem.Length);
+        mem.Position = 0;
+
+        rng = new Random(seed);
+        var byteReader = new StreamByteReader(mem);
+        var bitReader = new BitReader<StreamByteReader>(byteReader);
+
+        for (long i = 0; i < count; i++)
+            Assert.AreEqual((uint)rng.NextInt64(0, uint.MaxValue), bitReader.ReadEliasGamma32());
+    }
+
+    [TestMethod]
+    public void RoundtripEliasDeltaGamma()
+    {
+        var mem = new MemoryStream();
+        var byteWriter = new StreamByteWriter(mem);
+        var bitWriter = new BitWriter<StreamByteWriter>(byteWriter);
+
+        const int seed = 234235;
+        const int count = 100_000;
+
+        var rng = new Random(seed);
+        for (long i = 0; i < count; i++)
+            bitWriter.WriteEliasDeltaGamma32((uint)rng.NextInt64(0, uint.MaxValue));
+        bitWriter.Flush();
+
+        Console.WriteLine(mem.Length);
+        mem.Position = 0;
+
+        rng = new Random(seed);
+        var byteReader = new StreamByteReader(mem);
+        var bitReader = new BitReader<StreamByteReader>(byteReader);
+
+        for (long i = 0; i < count; i++)
+            Assert.AreEqual((uint)rng.NextInt64(0, uint.MaxValue), bitReader.ReadEliasDeltaGamma32());
     }
 }
