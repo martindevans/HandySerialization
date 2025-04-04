@@ -215,7 +215,7 @@ public static class Vectors
     {
         return new Complex(
             reader.ReadFloat64(),
-            reader.ReadFloat32()
+            reader.ReadFloat64()
         );
     }
 

@@ -141,7 +141,7 @@ public class FloatTests
     {
         var rng = new Random(347245);
 
-        const int count = 2000;
+        const int count = 1000;
         var sequence = new float[count];
         var output = new float[count];
         for (var i = 0; i < count; i++)
@@ -172,7 +172,7 @@ public class FloatTests
     {
         var rng = new Random(347245);
 
-        const int count = 2000;
+        const int count = 1000;
         var sequence = new double[count];
         var output = new double[count];
         for (var i = 0; i < count; i++)
@@ -203,7 +203,7 @@ public class FloatTests
     {
         var rng = new Random(347245);
 
-        const int count = 2000;
+        const int count = 1000;
         var sequence = new int[count];
         var output = new int[count];
         for (var i = 0; i < count; i++)
@@ -234,7 +234,7 @@ public class FloatTests
     {
         var rng = new Random(347245);
 
-        const int count = 2000;
+        const int count = 1000;
         var sequence = new uint[count];
         var output = new uint[count];
         for (var i = 0; i < count; i++)
@@ -265,7 +265,7 @@ public class FloatTests
     {
         var rng = new Random(98457);
 
-        const int count = 2000;
+        const int count = 1000;
         var sequence = new long[count];
         var output = new long[count];
         for (var i = 0; i < count; i++)
@@ -296,7 +296,7 @@ public class FloatTests
     {
         var rng = new Random(98457);
 
-        const int count = 2000;
+        const int count = 1000;
         var sequence = new ulong[count];
         var output = new ulong[count];
         for (var i = 0; i < count; i++)

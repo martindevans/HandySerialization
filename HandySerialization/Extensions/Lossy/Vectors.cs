@@ -129,7 +129,6 @@ public static class Vectors
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="q"></param>
-    /// <exception cref="InvalidOperationException"></exception>
     public static void WriteCompressedQuaternion<T>(this ref T writer, Quaternion q)
         where T : struct, IByteWriter
     {
