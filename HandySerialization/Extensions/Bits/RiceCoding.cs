@@ -5,7 +5,7 @@ namespace HandySerialization.Extensions.Bits;
 public static class RiceCodingExtensions
 {
     /// <summary>
-    /// Write out a number using rice coding. Suitable for small numbers. K should be chosen such that 
+    /// Write out a number using rice coding. Suitable for small numbers.
     /// </summary>
     /// <typeparam name="TBytes"></typeparam>
     /// <param name="writer"></param>

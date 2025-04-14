@@ -189,5 +189,68 @@ namespace HandySerialization.Tests
                 Assert.AreEqual(mat, mout);
             }
         }
+
+        [TestMethod]
+        public void Vector2RoundTrip()
+        {
+            var rng = new Random(3572456);
+
+            const int count = 1_000_000;
+            for (var i = 0; i < count; i++)
+            {
+                var serializer = new TestWriterReader();
+
+                var vin = new Vector2(rng.NextSingle() * rng.Next(), rng.NextSingle() * rng.Next());
+                serializer.Write(vin);
+
+                Console.WriteLine(serializer.UnreadBytes);
+                var vout = serializer.ReadVector2();
+                Assert.AreEqual(0, serializer.UnreadBytes);
+
+                Assert.AreEqual(vin, vout);
+            }
+        }
+
+        [TestMethod]
+        public void Vector3RoundTrip()
+        {
+            var rng = new Random(3572456);
+
+            const int count = 1_000_000;
+            for (var i = 0; i < count; i++)
+            {
+                var serializer = new TestWriterReader();
+
+                var vin = new Vector3(rng.NextSingle() * rng.Next(), rng.NextSingle() * rng.Next(), rng.NextSingle() * rng.Next());
+                serializer.Write(vin);
+
+                Console.WriteLine(serializer.UnreadBytes);
+                var vout = serializer.ReadVector3();
+                Assert.AreEqual(0, serializer.UnreadBytes);
+
+                Assert.AreEqual(vin, vout);
+            }
+        }
+
+        [TestMethod]
+        public void Vector4RoundTrip()
+        {
+            var rng = new Random(3572456);
+
+            const int count = 1_000_000;
+            for (var i = 0; i < count; i++)
+            {
+                var serializer = new TestWriterReader();
+
+                var vin = new Vector4(rng.NextSingle() * rng.Next(), rng.NextSingle() * rng.Next(), rng.NextSingle() * rng.Next(), rng.NextSingle() * rng.Next());
+                serializer.Write(vin);
+
+                Console.WriteLine(serializer.UnreadBytes);
+                var vout = serializer.ReadVector4();
+                Assert.AreEqual(0, serializer.UnreadBytes);
+
+                Assert.AreEqual(vin, vout);
+            }
+        }
     }
 }

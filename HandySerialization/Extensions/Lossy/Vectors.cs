@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace HandySerialization.Extensions.Lossy;
+﻿namespace HandySerialization.Extensions.Lossy;
 
 public static class Vectors
 {

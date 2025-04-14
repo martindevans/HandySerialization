@@ -1,7 +1,4 @@
-﻿using System.Buffers;
-using System.Numerics;
-
-namespace HandySerialization.Extensions;
+﻿namespace HandySerialization.Extensions;
 
 public static class Vectors
 {

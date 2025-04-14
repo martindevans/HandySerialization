@@ -4,11 +4,6 @@ namespace HandySerialization.Extensions.Bits;
 
 public static class GammaCodingExtensions
 {
-    private static byte BitsNeeded(uint value)
-    {
-        return (byte)(32 - BitTwiddle.LeadingZeros(value));
-    }
-
     /// <summary>
     /// Write out a number using elias gamma coding. Suitable for small numbers.
     /// Writes out the number of bits required in unary, then the value itself using that many bits.
@@ -20,8 +15,8 @@ public static class GammaCodingExtensions
         where TBytes : struct, IByteWriter
     {
         // Write out number of bits needed
-        var bits = (byte)(32 - BitTwiddle.LeadingZeros(value));
-        writer.WriteUnaryInt(BitsNeeded(value));
+        var bits = BitTwiddle.BitsNeeded32(value);
+        writer.WriteUnaryInt(bits);
 
         // Write out the number itself
         writer.WriteSmallUInt(value, bits);
@@ -45,8 +40,8 @@ public static class GammaCodingExtensions
         where TBytes : struct, IByteWriter
     {
         // Write out number of bits needed
-        var bits = (byte)(32 - BitTwiddle.LeadingZeros(value));
-        writer.WriteEliasGamma32(BitsNeeded(value));
+        var bits = BitTwiddle.BitsNeeded32(value);
+        writer.WriteEliasGamma32(bits);
 
         // Write out the number itself
         writer.WriteSmallUInt(value, bits);

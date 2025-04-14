@@ -7,6 +7,62 @@ namespace HandySerialization.Tests;
 public class BitWritingTests
 {
     [TestMethod]
+    public void BasicBulkWrite()
+    {
+        var mem = new MemoryStream();
+        var byteWriter = new StreamByteWriter(mem);
+        var bitWriter = new BitWriter<StreamByteWriter>(byteWriter);
+
+        //                __xx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+        bitWriter.Write(0b1111_0101_1010_1100_0000_1111_0011_0000u, 30);
+        bitWriter.Flush();
+
+        Assert.AreEqual(4, mem.Length);
+        mem.Position = 0;
+
+        var byteReader = new StreamByteReader(mem);
+        var bitReader = new BitReader<StreamByteReader>(byteReader);
+
+        Assert.AreEqual(true, bitReader.Read());
+        Assert.AreEqual(true, bitReader.Read());
+
+        Assert.AreEqual(false, bitReader.Read());
+        Assert.AreEqual(true, bitReader.Read());
+        Assert.AreEqual(false, bitReader.Read());
+        Assert.AreEqual(true, bitReader.Read());
+
+        Assert.AreEqual(true, bitReader.Read());
+        Assert.AreEqual(false, bitReader.Read());
+        Assert.AreEqual(true, bitReader.Read());
+        Assert.AreEqual(false, bitReader.Read());
+
+        Assert.AreEqual(true, bitReader.Read());
+        Assert.AreEqual(true, bitReader.Read());
+        Assert.AreEqual(false, bitReader.Read());
+        Assert.AreEqual(false, bitReader.Read());
+
+        Assert.AreEqual(false, bitReader.Read());
+        Assert.AreEqual(false, bitReader.Read());
+        Assert.AreEqual(false, bitReader.Read());
+        Assert.AreEqual(false, bitReader.Read());
+
+        Assert.AreEqual(true, bitReader.Read());
+        Assert.AreEqual(true, bitReader.Read());
+        Assert.AreEqual(true, bitReader.Read());
+        Assert.AreEqual(true, bitReader.Read());
+
+        Assert.AreEqual(false, bitReader.Read());
+        Assert.AreEqual(false, bitReader.Read());
+        Assert.AreEqual(true, bitReader.Read());
+        Assert.AreEqual(true, bitReader.Read());
+
+        Assert.AreEqual(false, bitReader.Read());
+        Assert.AreEqual(false, bitReader.Read());
+        Assert.AreEqual(false, bitReader.Read());
+        Assert.AreEqual(false, bitReader.Read());
+    }
+
+    [TestMethod]
     public void RoundtripInt2()
     {
         var mem = new MemoryStream();
@@ -61,6 +117,37 @@ public class BitWritingTests
     }
 
     [TestMethod]
+    public void RoundtripInt50()
+    {
+        const int seed = 324892;
+        const int count = 100_000;
+
+        var mem = new MemoryStream();
+        var byteWriter = new StreamByteWriter(mem);
+        var bitWriter = new BitWriter<StreamByteWriter>(byteWriter);
+
+        var rng = new Random(seed);
+        for (var i = 0; i < count; i++)
+        {
+            var v = unchecked((ulong)rng.NextInt64()) & BitTwiddle.Mask(50);
+            bitWriter.WriteUInt50(v);
+        }
+
+        bitWriter.Flush();
+
+        mem.Position = 0;
+
+        var byteReader = new StreamByteReader(mem);
+        var bitReader = new BitReader<StreamByteReader>(byteReader);
+        rng = new Random(seed);
+        for (var i = 0; i < count; i++)
+        {
+            var v = unchecked((ulong)rng.NextInt64()) & BitTwiddle.Mask(50);
+            Assert.AreEqual(v, bitReader.ReadUInt50());
+        }
+    }
+
+    [TestMethod]
     public void RoundtripSmallInt()
     {
         var mem = new MemoryStream();
@@ -91,6 +178,7 @@ public class BitWritingTests
             bitWriter.WriteUnaryInt((byte)i);
         bitWriter.Flush();
 
+        Assert.AreEqual(4080, mem.Length);
         mem.Position = 0;
 
         var byteReader = new StreamByteReader(mem);

@@ -99,10 +99,10 @@ public static class Sequences
     public static void WriteCompressedSequence<#=config.Name#><T>(this ref T writer, ReadOnlySpan<<#=config.TypeAlias#>> <#=input#>)
         where T : struct, IByteWriter
     {
-        <#=config.IntAlias#> prev = 0;
+        var prev = (<#=config.IntAlias#>)0;
         for (var i = 0; i < <#=input#>.Length; i++)
         {
-            <#=config.IntAlias#> fint = <#=config.ConvToInt#>(<#=input#>[i]);
+            var fint = <#=config.ConvToInt#>(<#=input#>[i]);
             var xor = fint ^ prev;
             prev = fint;
 <# if (config.Unsigned) { #>

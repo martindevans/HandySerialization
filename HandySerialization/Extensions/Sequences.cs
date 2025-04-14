@@ -1,4 +1,5 @@
-﻿namespace HandySerialization.Extensions;
+﻿
+namespace HandySerialization.Extensions;
 
 
 public static class Sequences
@@ -14,10 +15,10 @@ public static class Sequences
     public static void WriteCompressedSequenceFloat32<T>(this ref T writer, ReadOnlySpan<float> floats)
         where T : struct, IByteWriter
     {
-        int prev = 0;
+        var prev = (int)0;
         for (var i = 0; i < floats.Length; i++)
         {
-            int fint = BitConverter.SingleToInt32Bits(floats[i]);
+            var fint = BitConverter.SingleToInt32Bits(floats[i]);
             var xor = fint ^ prev;
             prev = fint;
             writer.WriteVariableInt64(xor);
@@ -98,10 +99,10 @@ public static class Sequences
     public static void WriteCompressedSequenceFloat64<T>(this ref T writer, ReadOnlySpan<double> doubles)
         where T : struct, IByteWriter
     {
-        long prev = 0;
+        var prev = (long)0;
         for (var i = 0; i < doubles.Length; i++)
         {
-            long fint = BitConverter.DoubleToInt64Bits(doubles[i]);
+            var fint = BitConverter.DoubleToInt64Bits(doubles[i]);
             var xor = fint ^ prev;
             prev = fint;
             writer.WriteVariableInt64(xor);
@@ -182,10 +183,10 @@ public static class Sequences
     public static void WriteCompressedSequenceInt32<T>(this ref T writer, ReadOnlySpan<int> ints)
         where T : struct, IByteWriter
     {
-        int prev = 0;
+        var prev = (int)0;
         for (var i = 0; i < ints.Length; i++)
         {
-            int fint = (ints[i]);
+            var fint = (ints[i]);
             var xor = fint ^ prev;
             prev = fint;
             writer.WriteVariableInt64(xor);
@@ -266,10 +267,10 @@ public static class Sequences
     public static void WriteCompressedSequenceUInt32<T>(this ref T writer, ReadOnlySpan<uint> uints)
         where T : struct, IByteWriter
     {
-        uint prev = 0;
+        var prev = (uint)0;
         for (var i = 0; i < uints.Length; i++)
         {
-            uint fint = (uints[i]);
+            var fint = (uints[i]);
             var xor = fint ^ prev;
             prev = fint;
             writer.WriteVariableUInt64(xor);
@@ -350,10 +351,10 @@ public static class Sequences
     public static void WriteCompressedSequenceInt64<T>(this ref T writer, ReadOnlySpan<long> longs)
         where T : struct, IByteWriter
     {
-        long prev = 0;
+        var prev = (long)0;
         for (var i = 0; i < longs.Length; i++)
         {
-            long fint = (longs[i]);
+            var fint = (longs[i]);
             var xor = fint ^ prev;
             prev = fint;
             writer.WriteVariableInt64(xor);
@@ -434,10 +435,10 @@ public static class Sequences
     public static void WriteCompressedSequenceUInt64<T>(this ref T writer, ReadOnlySpan<ulong> ulongs)
         where T : struct, IByteWriter
     {
-        ulong prev = 0;
+        var prev = (ulong)0;
         for (var i = 0; i < ulongs.Length; i++)
         {
-            ulong fint = (ulongs[i]);
+            var fint = (ulongs[i]);
             var xor = fint ^ prev;
             prev = fint;
             writer.WriteVariableUInt64(xor);

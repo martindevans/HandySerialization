@@ -6,7 +6,7 @@ internal static class BitTwiddle
     public static uint LeadingZeros(uint x)
     {
 #if NET5_0_OR_GREATER
-        return (uint)System.Numerics.BitOperations.LeadingZeroCount(x);
+        return (uint)BitOperations.LeadingZeroCount(x);
 #else
         const uint numIntBits = sizeof(uint) * 8; //compile time constant
         
@@ -25,5 +25,29 @@ internal static class BitTwiddle
         x += x >> 16;
         return numIntBits - (x & 0x0000003F); //subtract # of 1s from 32
 #endif
+    }
+
+    public static byte BitsNeeded32(uint value)
+    {
+        return (byte)(32 - BitTwiddle.LeadingZeros(value));
+    }
+
+    public static uint Exponent(double value)
+    {
+        var bits = BitConverter.DoubleToInt64Bits(value);
+        var exponent = (uint)((bits >> 52) & 0b_111_11111111);
+        return exponent;
+    }
+
+    public static ulong Mantissa(double value)
+    {
+        var bits = BitConverter.DoubleToInt64Bits(value);
+        var mantissa = (ulong)(bits & 0x_F_FFFF_FFFF_FFFF);
+        return mantissa;
+    }
+
+    public static uint Mask(int bits)
+    {
+        return (1u << bits) - 1u;
     }
 }
