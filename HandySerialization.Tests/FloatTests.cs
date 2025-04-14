@@ -321,4 +321,31 @@ public class FloatTests
             Assert.IsTrue(sequence.SequenceEqual(output));
         }
     }
+
+    [TestMethod]
+    public void RoundTripFloatSequenceFloat64_Delta()
+    {
+        var rng = new Random(5683656);
+
+        const int count = 1000;
+        var sequence = new double[count];
+        var output = new double[count];
+        for (var i = 0; i < count; i++)
+        {
+            for (var j = 0; j < sequence.Length; j++)
+            {
+                if (j == 0)
+                    sequence[j] = (rng.NextDouble() - 0.5) * 1_000;
+                else
+                    sequence[j] = sequence[j - 1] + (rng.NextDouble() - 0.5) * 1_000;
+            }
+
+            var serializer = new TestWriterReader();
+
+            serializer.WriteDeltaCompressedSequence(3, sequence);
+            serializer.ReadDeltaCompressedSequence(3, output);
+
+            Assert.IsTrue(sequence.SequenceEqual(output));
+        }
+    }
 }

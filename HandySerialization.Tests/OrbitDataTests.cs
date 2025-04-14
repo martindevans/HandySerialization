@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO.Compression;
+using System.Runtime.InteropServices;
 using HandySerialization.Extensions;
 using HandySerialization.Extensions.Bits;
 using HandySerialization.Wrappers;
@@ -253,18 +254,28 @@ public class OrbitDataTests
         writer.Write((ushort)page.Positions.Count);
         writer.Write(page.ID);
 
-        // Vel
-        WriteDoubleSequence(page.Velocities.Select(a => a.X).ToArray());
-        WriteDoubleSequence(page.Velocities.Select(a => a.Y).ToArray());
-        WriteDoubleSequence(page.Velocities.Select(a => a.Z).ToArray());
+        //// Vel
+        //WriteDoubleSequence(page.Velocities.Select(a => a.X).ToArray());
+        //WriteDoubleSequence(page.Velocities.Select(a => a.Y).ToArray());
+        //WriteDoubleSequence(page.Velocities.Select(a => a.Z).ToArray());
 
-        // Times
-        WriteDoubleSequence(page.Timestamps.ToArray());
+        //// Times
+        //WriteDoubleSequence(page.Timestamps.ToArray());
 
-        // Pos
-        WriteDoubleSequence(page.Positions.Select(a => a.X).ToArray());
-        WriteDoubleSequence(page.Positions.Select(a => a.Y).ToArray());
-        WriteDoubleSequence(page.Positions.Select(a => a.Z).ToArray());
+        //// Pos
+        //WriteDoubleSequence(page.Positions.Select(a => a.X).ToArray());
+        //WriteDoubleSequence(page.Positions.Select(a => a.Y).ToArray());
+        //WriteDoubleSequence(page.Positions.Select(a => a.Z).ToArray());
+
+        writer.WriteDeltaCompressedSequence(8, MemoryMarshal.Cast<double3, double>(page.Velocities.ToArray()), 0, 3);
+        writer.WriteDeltaCompressedSequence(8, MemoryMarshal.Cast<double3, double>(page.Velocities.ToArray()), 1, 3);
+        writer.WriteDeltaCompressedSequence(8, MemoryMarshal.Cast<double3, double>(page.Velocities.ToArray()), 2, 3);
+
+        writer.WriteDeltaCompressedSequence(8, MemoryMarshal.Cast<double,  double>(page.Timestamps.ToArray()));
+
+        writer.WriteDeltaCompressedSequence(8, MemoryMarshal.Cast<double3, double>(page.Positions.ToArray()), 0, 3);
+        writer.WriteDeltaCompressedSequence(8, MemoryMarshal.Cast<double3, double>(page.Positions.ToArray()), 1, 3);
+        writer.WriteDeltaCompressedSequence(8, MemoryMarshal.Cast<double3, double>(page.Positions.ToArray()), 2, 3);
 
         void WriteDoubleSequence(double[] values)
         {
@@ -294,9 +305,9 @@ public class OrbitDataTests
         {
             var exponent = BitTwiddle.Exponent(x);
 
-            // Mix in the exponent
-            var sign = (x < 0 ? 1u : 0u) << 12;
-            exponent |= sign;
+            // Mix in the sign
+            exponent <<= 1;
+            exponent |= x < 0 ? 1u : 0u;
 
             // xor with previous value, to get the changed bits
             var value = exponent ^ prevExponent;
