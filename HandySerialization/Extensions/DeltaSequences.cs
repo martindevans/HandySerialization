@@ -5,7 +5,7 @@ namespace HandySerialization.Extensions;
 
 public static class DeltaSequences
 {
-    public static void WriteDeltaCompressedSequence<TByteWriter>(this TByteWriter writer, int predictorOrder, ReadOnlySpan<double> values, int offset = 0, int stride = 1)
+    public static void WriteDeltaCompressedSequence<TByteWriter>(this TByteWriter writer, byte predictorOrder, ReadOnlySpan<double> values, int offset = 0, int stride = 1)
         where TByteWriter : struct, IByteWriter
     {
         // Write exponents with sign bit

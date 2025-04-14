@@ -2,7 +2,6 @@
 using System.IO.Compression;
 using System.Runtime.InteropServices;
 using HandySerialization.Extensions;
-using HandySerialization.Extensions.Bits;
 using HandySerialization.Wrappers;
 
 namespace HandySerialization.Tests;
@@ -254,19 +253,6 @@ public class OrbitDataTests
         writer.Write((ushort)page.Positions.Count);
         writer.Write(page.ID);
 
-        //// Vel
-        //WriteDoubleSequence(page.Velocities.Select(a => a.X).ToArray());
-        //WriteDoubleSequence(page.Velocities.Select(a => a.Y).ToArray());
-        //WriteDoubleSequence(page.Velocities.Select(a => a.Z).ToArray());
-
-        //// Times
-        //WriteDoubleSequence(page.Timestamps.ToArray());
-
-        //// Pos
-        //WriteDoubleSequence(page.Positions.Select(a => a.X).ToArray());
-        //WriteDoubleSequence(page.Positions.Select(a => a.Y).ToArray());
-        //WriteDoubleSequence(page.Positions.Select(a => a.Z).ToArray());
-
         writer.WriteDeltaCompressedSequence(8, MemoryMarshal.Cast<double3, double>(page.Velocities.ToArray()), 0, 3);
         writer.WriteDeltaCompressedSequence(8, MemoryMarshal.Cast<double3, double>(page.Velocities.ToArray()), 1, 3);
         writer.WriteDeltaCompressedSequence(8, MemoryMarshal.Cast<double3, double>(page.Velocities.ToArray()), 2, 3);
@@ -276,66 +262,5 @@ public class OrbitDataTests
         writer.WriteDeltaCompressedSequence(8, MemoryMarshal.Cast<double3, double>(page.Positions.ToArray()), 0, 3);
         writer.WriteDeltaCompressedSequence(8, MemoryMarshal.Cast<double3, double>(page.Positions.ToArray()), 1, 3);
         writer.WriteDeltaCompressedSequence(8, MemoryMarshal.Cast<double3, double>(page.Positions.ToArray()), 2, 3);
-
-        void WriteDoubleSequence(double[] values)
-        {
-            var bitWriter = new BitWriter<StreamByteWriter>(writer);
-
-            // Write sign bits and exponent
-            uint prevExponent = 0;
-            for (var i = 0; i < values.Length; i++)
-            {
-                var value = values[i];
-
-                prevExponent = WriteSignedDoubleExponent(ref bitWriter, value, prevExponent);
-            }
-
-            bitWriter.Flush();
-
-            // Write out mantissas
-            Span<long> mantissaState = stackalloc long[8];
-            for (var i = 0; i < values.Length; i++)
-            {
-                var value = values[i];
-                WriteDoubleMantissa(ref writer, value, mantissaState);
-            }
-        }
-
-        uint WriteSignedDoubleExponent(ref BitWriter<StreamByteWriter> writer, double x, uint prevExponent)
-        {
-            var exponent = BitTwiddle.Exponent(x);
-
-            // Mix in the sign
-            exponent <<= 1;
-            exponent |= x < 0 ? 1u : 0u;
-
-            // xor with previous value, to get the changed bits
-            var value = exponent ^ prevExponent;
-
-            // Write it out
-            writer.WriteEliasDeltaGamma32(value);
-
-            return exponent;
-        }
-
-        void WriteDoubleMantissa(ref StreamByteWriter writer, double x, Span<long> mantissaState)
-        {
-            var mantissa = BitTwiddle.Mantissa(x);
-
-            var state = (long)mantissa;
-            for (var i = 0; i < mantissaState.Length; i++)
-            {
-                var a = state;
-                var b = mantissaState[i];
-                mantissaState[i] = state;
-
-                state = a - b;
-            }
-
-            var zigzag = state.ZigZag();
-            writer.WriteVariableUInt64(zigzag);
-
-            //Console.WriteLine(zigzag);
-        }
     }
 }
