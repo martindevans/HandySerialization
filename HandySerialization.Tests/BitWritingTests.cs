@@ -11,7 +11,7 @@ public class BitWritingTests
     {
         var mem = new MemoryStream();
         var byteWriter = new StreamByteWriter(mem);
-        var bitWriter = new BitWriter<StreamByteWriter>(byteWriter);
+        var bitWriter = byteWriter.AsBitWriter();
 
         //                __xx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
         bitWriter.Write(0b1111_0101_1010_1100_0000_1111_0011_0000u, 30);
