@@ -6,7 +6,7 @@ namespace HandySerialization.Extensions;
 
 public static class Primitives
 {
-    public static void Write<T>(this ref T writer, bool b0, bool b1 = false, bool b2 = false, bool b3 = false, bool b4 = false, bool b5 = false, bool b6 = false, bool b7 = false)
+    public static void Write<T>(ref this T writer, bool b0, bool b1 = false, bool b2 = false, bool b3 = false, bool b4 = false, bool b5 = false, bool b6 = false, bool b7 = false)
         where T : struct, IByteWriter
     {
         var b = (byte)(
@@ -22,7 +22,7 @@ public static class Primitives
         writer.Write(b);
     }
 
-    public static void ReadBool<T>(this ref T reader, out bool b0, out bool b1, out bool b2, out bool b3, out bool b4, out bool b5, out bool b6, out bool b7)
+    public static void ReadBool<T>(ref this T reader, out bool b0, out bool b1, out bool b2, out bool b3, out bool b4, out bool b5, out bool b6, out bool b7)
         where T : struct, IByteReader
     {
         var b = reader.ReadUInt8();
@@ -38,14 +38,14 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this ref T writer, byte b)
+    public static void Write<T>(ref this T writer, byte b)
         where T : struct, IByteWriter
     {
         Span<byte> dest = stackalloc byte[] { b };
         writer.Write(dest);
     }
 
-    public static byte ReadUInt8<T>(this ref T reader)
+    public static byte ReadUInt8<T>(ref this T reader)
         where T : struct, IByteReader
     {
         Span<byte> dest = stackalloc byte[1];
@@ -54,20 +54,20 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this ref T writer, sbyte b)
+    public static void Write<T>(ref this T writer, sbyte b)
         where T : struct, IByteWriter
     {
         writer.Write(unchecked((byte)b));
     }
 
-    public static sbyte ReadInt8<T>(this ref T reader)
+    public static sbyte ReadInt8<T>(ref this T reader)
         where T : struct, IByteReader
     {
         return unchecked((sbyte)reader.ReadUInt8());
     }
 
 
-    public static void Write<T>(this ref T writer, ushort s)
+    public static void Write<T>(ref this T writer, ushort s)
         where T : struct, IByteWriter
     {
         Span<byte> span = stackalloc byte[2];
@@ -76,7 +76,7 @@ public static class Primitives
         writer.Write(span);
     }
 
-    public static ushort ReadUInt16<T>(this ref T reader)
+    public static ushort ReadUInt16<T>(ref this T reader)
         where T : struct, IByteReader
     {
         Span<byte> span = stackalloc byte[2];
@@ -86,7 +86,7 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this ref T writer, short s)
+    public static void Write<T>(ref this T writer, short s)
         where T : struct, IByteWriter
     {
         Span<byte> span = stackalloc byte[2];
@@ -95,7 +95,7 @@ public static class Primitives
         writer.Write(span);
     }
 
-    public static short ReadInt16<T>(this ref T reader)
+    public static short ReadInt16<T>(ref this T reader)
         where T : struct, IByteReader
     {
         Span<byte> span = stackalloc byte[2];
@@ -105,7 +105,7 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this ref T writer, uint i)
+    public static void Write<T>(ref this T writer, uint i)
         where T : struct, IByteWriter
     {
         Span<byte> span = stackalloc byte[4];
@@ -114,7 +114,7 @@ public static class Primitives
         writer.Write(span);
     }
 
-    public static uint ReadUInt32<T>(this ref T reader)
+    public static uint ReadUInt32<T>(ref this T reader)
         where T : struct, IByteReader
     {
         Span<byte> span = stackalloc byte[4];
@@ -124,7 +124,7 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this ref T writer, int i)
+    public static void Write<T>(ref this T writer, int i)
         where T : struct, IByteWriter
     {
         Span<byte> span = stackalloc byte[4];
@@ -133,7 +133,7 @@ public static class Primitives
         writer.Write(span);
     }
 
-    public static int ReadInt32<T>(this ref T reader)
+    public static int ReadInt32<T>(ref this T reader)
         where T : struct, IByteReader
     {
         Span<byte> span = stackalloc byte[4];
@@ -143,7 +143,7 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this ref T writer, ulong l)
+    public static void Write<T>(ref this T writer, ulong l)
         where T : struct, IByteWriter
     {
         Span<byte> span = stackalloc byte[8];
@@ -152,7 +152,7 @@ public static class Primitives
         writer.Write(span);
     }
 
-    public static ulong ReadUInt64<T>(this ref T reader)
+    public static ulong ReadUInt64<T>(ref this T reader)
         where T : struct, IByteReader
     {
         Span<byte> span = stackalloc byte[8];
@@ -162,7 +162,7 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this ref T writer, long l)
+    public static void Write<T>(ref this T writer, long l)
         where T : struct, IByteWriter
     {
         Span<byte> span = stackalloc byte[8];
@@ -171,7 +171,7 @@ public static class Primitives
         writer.Write(span);
     }
 
-    public static long ReadInt64<T>(this ref T reader)
+    public static long ReadInt64<T>(ref this T reader)
         where T : struct, IByteReader
     {
         Span<byte> span = stackalloc byte[8];
@@ -181,7 +181,7 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this ref T writer, float f)
+    public static void Write<T>(ref this T writer, float f)
         where T : struct, IByteWriter
     {
         var span = MemoryMarshal.Cast<float, byte>(stackalloc float[1] { f });
@@ -191,7 +191,7 @@ public static class Primitives
         writer.Write(span);
     }
 
-    public static float ReadFloat32<T>(this ref T reader)
+    public static float ReadFloat32<T>(ref this T reader)
         where T : struct, IByteReader
     {
         Span<byte> span = stackalloc byte[4];
@@ -204,7 +204,7 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this ref T writer, double d)
+    public static void Write<T>(ref this T writer, double d)
         where T : struct, IByteWriter
     {
         var span = MemoryMarshal.Cast<double, byte>(stackalloc double[1] { d });
@@ -214,7 +214,7 @@ public static class Primitives
         writer.Write(span);
     }
 
-    public static double ReadFloat64<T>(this ref T reader)
+    public static double ReadFloat64<T>(ref this T reader)
         where T : struct, IByteReader
     {
         Span<byte> span = stackalloc byte[8];
@@ -227,7 +227,7 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this ref T writer, string? str)
+    public static void Write<T>(ref this T writer, string? str)
         where T : struct, IByteWriter
     {
         // Use 0 to indicate a null string
@@ -254,7 +254,7 @@ public static class Primitives
         }
     }
 
-    public static string? ReadString<T>(this ref T reader)
+    public static string? ReadString<T>(ref this T reader)
         where T : struct, IByteReader
     {
         var byteCount = (int)reader.ReadVariableUInt64();
@@ -278,7 +278,7 @@ public static class Primitives
     }
 
 
-    public static void Write<T>(this ref T writer, char c)
+    public static void Write<T>(ref this T writer, char c)
         where T : struct, IByteWriter
     {
         Span<byte> span = stackalloc byte[2];
@@ -287,7 +287,7 @@ public static class Primitives
         writer.Write(span);
     }
 
-    public static char ReadChar<T>(this ref T reader)
+    public static char ReadChar<T>(ref this T reader)
         where T : struct, IByteReader
     {
         Span<byte> span = stackalloc byte[2];
@@ -298,13 +298,13 @@ public static class Primitives
 
 
 
-    public static void Write<T>(this ref T writer, TimeSpan t)
+    public static void Write<T>(ref this T writer, TimeSpan t)
         where T : struct, IByteWriter
     {
         writer.WriteVariableInt64(t.Ticks);
     }
 
-    public static TimeSpan ReadTimeSpan<T>(this ref T reader)
+    public static TimeSpan ReadTimeSpan<T>(ref this T reader)
         where T : struct, IByteReader
     {
         return new TimeSpan(reader.ReadVariableInt64());

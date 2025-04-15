@@ -8,14 +8,14 @@ public static class Vectors
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="v"></param>
-    public static void Write<T>(this ref T writer, Vector2 v)
+    public static void Write<T>(ref this T writer, Vector2 v)
         where T : struct, IByteWriter
     {
         writer.Write(v.X);
         writer.Write(v.Y);
     }
 
-    public static Vector2 ReadVector2<T>(this ref T reader)
+    public static Vector2 ReadVector2<T>(ref this T reader)
         where T : struct, IByteReader
     {
         return new Vector2(
@@ -31,7 +31,7 @@ public static class Vectors
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="v"></param>
-    public static void Write<T>(this ref T writer, Vector3 v)
+    public static void Write<T>(ref this T writer, Vector3 v)
         where T : struct, IByteWriter
     {
         writer.Write(v.X);
@@ -39,7 +39,7 @@ public static class Vectors
         writer.Write(v.Z);
     }
 
-    public static Vector3 ReadVector3<T>(this ref T reader)
+    public static Vector3 ReadVector3<T>(ref this T reader)
         where T : struct, IByteReader
     {
         return new Vector3(
@@ -56,7 +56,7 @@ public static class Vectors
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="v"></param>
-    public static void Write<T>(this ref T writer, Vector4 v)
+    public static void Write<T>(ref this T writer, Vector4 v)
         where T : struct, IByteWriter
     {
         writer.Write(v.X);
@@ -65,7 +65,7 @@ public static class Vectors
         writer.Write(v.W);
     }
 
-    public static Vector4 ReadVector4<T>(this ref T reader)
+    public static Vector4 ReadVector4<T>(ref this T reader)
         where T : struct, IByteReader
     {
         return new Vector4(
@@ -83,7 +83,7 @@ public static class Vectors
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="q"></param>
-    public static void Write<T>(this ref T writer, Quaternion q)
+    public static void Write<T>(ref this T writer, Quaternion q)
         where T : struct, IByteWriter
     {
         writer.Write(q.X);
@@ -92,7 +92,7 @@ public static class Vectors
         writer.Write(q.W);
     }
 
-    public static Quaternion ReadQuaternion<T>(this ref T reader)
+    public static Quaternion ReadQuaternion<T>(ref this T reader)
         where T : struct, IByteReader
     {
         return new Quaternion(
@@ -110,7 +110,7 @@ public static class Vectors
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="m"></param>
-    public static void Write<T>(this ref T writer, Matrix4x4 m)
+    public static void Write<T>(ref this T writer, Matrix4x4 m)
         where T : struct, IByteWriter
     {
         writer.Write(m.M11);
@@ -134,7 +134,7 @@ public static class Vectors
         writer.Write(m.M44);
     }
 
-    public static Matrix4x4 ReadMatrix4x4<T>(this ref T reader)
+    public static Matrix4x4 ReadMatrix4x4<T>(ref this T reader)
         where T : struct, IByteReader
     {
         return new Matrix4x4(
@@ -166,7 +166,7 @@ public static class Vectors
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="m"></param>
-    public static void Write<T>(this ref T writer, Matrix3x2 m)
+    public static void Write<T>(ref this T writer, Matrix3x2 m)
         where T : struct, IByteWriter
     {
         writer.Write(m.M11);
@@ -179,7 +179,7 @@ public static class Vectors
         writer.Write(m.M32);
     }
 
-    public static Matrix3x2 ReadMatrix3x2<T>(this ref T reader)
+    public static Matrix3x2 ReadMatrix3x2<T>(ref this T reader)
         where T : struct, IByteReader
     {
         return new Matrix3x2(
@@ -200,14 +200,14 @@ public static class Vectors
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="c"></param>
-    public static void Write<T>(this ref T writer, Complex c)
+    public static void Write<T>(ref this T writer, Complex c)
         where T : struct, IByteWriter
     {
         writer.Write(c.Real);
         writer.Write(c.Imaginary);
     }
 
-    public static Complex ReadComplex<T>(this ref T reader)
+    public static Complex ReadComplex<T>(ref this T reader)
         where T : struct, IByteReader
     {
         return new Complex(
@@ -222,14 +222,14 @@ public static class Vectors
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="p"></param>
-    public static void Write<T>(this ref T writer, Plane p)
+    public static void Write<T>(ref this T writer, Plane p)
         where T : struct, IByteWriter
     {
         writer.Write(p.Normal);
         writer.Write(p.D);
     }
 
-    public static Plane ReadPlane<T>(this ref T reader)
+    public static Plane ReadPlane<T>(ref this T reader)
         where T : struct, IByteReader
     {
         return new Plane(
@@ -244,7 +244,7 @@ public static class Vectors
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="b"></param>
-    public static void Write<T>(this ref T writer, BigInteger b)
+    public static void Write<T>(ref this T writer, BigInteger b)
         where T : struct, IByteWriter
     {
         var bytesArr = ArrayPool<byte>.Shared.Rent(b.GetByteCount());
@@ -264,7 +264,7 @@ public static class Vectors
         }
     }
 
-    public static BigInteger ReadBigInteger<T>(this ref T reader)
+    public static BigInteger ReadBigInteger<T>(ref this T reader)
         where T : struct, IByteReader
     {
         var length = checked((int)reader.ReadVariableUInt64());

@@ -17,19 +17,20 @@ public static class SmallIntExtensions
     /// </summary>
     /// <typeparam name="TBytes"></typeparam>
     /// <param name="writer"></param>
+    /// <param name="bytes"></param>
     /// <param name="value"></param>
-    public static void WriteUInt<#= nbits #><TBytes>(ref this BitWriter<TBytes> writer, <#= NumericType(nbits) #> value)
+    public static void WriteUInt<#= nbits #><TBytes>(ref this BitWriter writer, ref TBytes bytes, <#= NumericType(nbits) #> value)
         where TBytes : struct, IByteWriter
     {
-        writer.Write(value, <#= nbits #>);
+        writer.Write(ref bytes, value, <#= nbits #>);
     }
 
-    public static <#= NumericType(nbits) #> ReadUInt<#= nbits #><TBytes>(ref this BitReader<TBytes> reader)
+    public static <#= NumericType(nbits) #> ReadUInt<#= nbits #><TBytes>(ref this BitReader reader, ref TBytes bytes)
         where TBytes : struct, IByteReader
     {
-        return (reader.Read() ? <#= SingleBitMask(nbits - 1, nbits) #> : 0)
+        return (reader.Read(ref bytes) ? <#= SingleBitMask(nbits - 1, nbits) #> : 0)
 <# for (var i = 1; i < nbits; i++) { #>
-             | (reader.Read() ? <#= SingleBitMask(nbits - i - 1, nbits) #> : 0)
+             | (reader.Read(ref bytes) ? <#= SingleBitMask(nbits - i - 1, nbits) #> : 0)
 <# } #>
              ;
     }
@@ -40,21 +41,22 @@ public static class SmallIntExtensions
     /// </summary>
     /// <typeparam name="TBytes"></typeparam>
     /// <param name="writer"></param>
+    /// <param name="bytes"></param>
     /// <param name="value"></param>
     /// <param name="bits"></param>
-    public static void WriteSmallUInt<TBytes>(ref this BitWriter<TBytes> writer, uint value, uint bits)
+    public static void WriteSmallUInt<TBytes>(ref this BitWriter writer, ref TBytes bytes, uint value, uint bits)
         where TBytes : struct, IByteWriter
     {
-        writer.Write(value, bits);
+        writer.Write(ref bytes, value, bits);
     }
 
-    public static uint ReadSmallUInt<TBytes>(ref this BitReader<TBytes> reader, uint bits)
+    public static uint ReadSmallUInt<TBytes>(ref this BitReader reader, ref TBytes bytes, uint bits)
         where TBytes : struct, IByteReader
     {
         var value = 0u;
 
         for (var i = 0u; i < bits; i++)
-            value |= reader.Read() ? 1u << (int)(bits - i - 1u) : 0u;
+            value |= reader.Read(ref bytes) ? 1u << (int)(bits - i - 1u) : 0u;
 
         return value;
     }
@@ -64,20 +66,21 @@ public static class SmallIntExtensions
     /// </summary>
     /// <typeparam name="TBytes"></typeparam>
     /// <param name="writer"></param>
+    /// <param name="bytes"></param>
     /// <param name="value"></param>
-    public static void WriteUnaryInt<TBytes>(ref this BitWriter<TBytes> writer, byte value)
+    public static void WriteUnaryInt<TBytes>(ref this BitWriter writer, ref TBytes bytes, byte value)
         where TBytes : struct, IByteWriter
     {
         for (var i = 0; i < value; i++)
-            writer.Write(false);
-        writer.Write(true);
+            writer.Write(ref bytes, false);
+        writer.Write(ref bytes, true);
     }
 
-    public static byte ReadUnaryInt<TBytes>(ref this BitReader<TBytes> reader)
+    public static byte ReadUnaryInt<TBytes>(ref this BitReader reader, ref TBytes bytes)
         where TBytes : struct, IByteReader
     {
         var count = 0;
-        while (!reader.Read())
+        while (!reader.Read(ref bytes))
             count++;
         return (byte)count;
     }

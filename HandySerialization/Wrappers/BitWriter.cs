@@ -3,8 +3,7 @@ using HandySerialization.Extensions;
 
 namespace HandySerialization.Wrappers;
 
-public struct BitWriter<TBytes>
-    where TBytes : struct, IByteWriter
+public struct BitWriter
 {
     private static readonly uint[] Masks =
     [
@@ -19,23 +18,18 @@ public struct BitWriter<TBytes>
         0b1111_1111u,
     ];
 
-    private TBytes _writer;
-
     private byte _buffer;
     private uint _bits;
 
     public int TotalWritten { get; private set; }
 
-    public BitWriter(TBytes writer)
-    {
-        _writer = writer;
-    }
-
     /// <summary>
     /// Write one single bit
     /// </summary>
+    /// <param name="writer"></param>
     /// <param name="bit"></param>
-    public void Write(bool bit)
+    public void Write<TBytes>(ref TBytes writer, bool bit)
+        where TBytes : struct, IByteWriter
     {
         TotalWritten++;
 
@@ -44,26 +38,30 @@ public struct BitWriter<TBytes>
         _bits++;
 
         if (_bits == 8)
-            Flush();
+            Flush(ref writer);
         Debug.Assert(_bits < 8);
     }
 
     /// <summary>
     /// Write multiple bits. Equivalent to writing the bits one by one from MSB to LSB
     /// </summary>
+    /// <param name="writer"></param>
     /// <param name="data"></param>
     /// <param name="count"></param>
-    public void Write(uint data, uint count)
+    public void Write<TBytes>(ref TBytes writer, uint data, uint count)
+        where TBytes : struct, IByteWriter
     {
-        Write((ulong)data, count);
+        Write(ref writer, (ulong)data, count);
     }
 
     /// <summary>
     /// Write the N least significant bits. MSB first. Equivalent to writing the bits one by one from MSB to LSB
     /// </summary>
+    /// <param name="writer"></param>
     /// <param name="data"></param>
     /// <param name="count"></param>
-    public void Write(ulong data, uint count)
+    public void Write<TBytes>(ref TBytes writer, ulong data, uint count)
+        where TBytes : struct, IByteWriter
     {
         if (count > 64)
             throw new ArgumentOutOfRangeException(nameof(count), "Cannot append more than 64 bits");
@@ -76,7 +74,7 @@ public struct BitWriter<TBytes>
         {
             // Make space
             if (_bits == 8)
-                Flush();
+                Flush(ref writer);
 
             // How many bits to put into the buffer
             var amount = Math.Min(8, Math.Min(count, 8u - _bits));
@@ -95,11 +93,12 @@ public struct BitWriter<TBytes>
         }
 
         if (_bits == 8)
-            Flush();
+            Flush(ref writer);
         Debug.Assert(_bits < 8);
     }
 
-    public void Flush()
+    public void Flush<TBytes>(ref TBytes writer)
+        where TBytes : struct, IByteWriter
     {
         if (_bits == 0)
             return;
@@ -107,30 +106,23 @@ public struct BitWriter<TBytes>
         if (_bits != 8)
             _buffer <<= (int)(8 - _bits);
 
-        _writer.Write(_buffer);
+        writer.Write(_buffer);
         _bits = 0;
         _buffer = 0;
     }
 }
 
-public struct BitReader<TBytes>
-    where TBytes : struct, IByteReader
+public struct BitReader
 {
-    private TBytes _reader;
-
     private byte _buffer;
     private int _bits;
 
-    public BitReader(TBytes writer)
-    {
-        _reader = writer;
-    }
-
-    public bool Read()
+    public bool Read<TBytes>(ref TBytes reader)
+        where TBytes : struct, IByteReader
     {
         if (_bits == 0)
         {
-            _buffer = _reader.ReadUInt8();
+            _buffer = reader.ReadUInt8();
             _bits = 8;
         }
 

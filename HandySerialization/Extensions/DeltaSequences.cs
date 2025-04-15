@@ -5,21 +5,21 @@ namespace HandySerialization.Extensions;
 
 public static class DeltaSequences
 {
-    public static void WriteDeltaCompressedSequence<TByteWriter>(this TByteWriter writer, byte predictorOrder, ReadOnlySpan<double> values, int offset = 0, int stride = 1)
+    public static void WriteDeltaCompressedSequence<TByteWriter>(ref this TByteWriter writer, byte predictorOrder, ReadOnlySpan<double> values, int offset = 0, int stride = 1)
         where TByteWriter : struct, IByteWriter
     {
         // Write exponents with sign bit
         {
-            var bitWriter = new BitWriter<TByteWriter>(writer);
+            var bitWriter = new BitWriter();
             {
                 uint prevExponent = 0;
                 for (var i = offset; i < values.Length; i += stride)
                 {
                     var value = values[i];
-                    prevExponent = WriteSignedDoubleExponent(ref bitWriter, value, prevExponent);
+                    prevExponent = WriteSignedDoubleExponent(ref bitWriter, ref writer, value, prevExponent);
                 }
             }
-            bitWriter.Flush();
+            bitWriter.Flush(ref writer);
         }
 
         // Write out mantissas
@@ -30,7 +30,7 @@ public static class DeltaSequences
             WriteDoubleMantissa(ref writer, value, mantissaPredictors);
         }
 
-        static uint WriteSignedDoubleExponent(ref BitWriter<TByteWriter> writer, double x, uint prev)
+        static uint WriteSignedDoubleExponent(ref BitWriter writer, ref TByteWriter bytes, double x, uint prev)
         {
             var exponent = BitTwiddle.Exponent(x);
 
@@ -42,7 +42,7 @@ public static class DeltaSequences
             var value = exponent ^ prev;
 
             // Write it out
-            writer.WriteEliasDeltaGamma32(value);
+            writer.WriteEliasDeltaGamma32(ref bytes, value);
 
             return exponent;
         }
@@ -66,7 +66,7 @@ public static class DeltaSequences
         }
     }
 
-    public static void ReadDeltaCompressedSequence<TByteReader>(this TByteReader reader, int predictorOrder, Span<double> values, int offset = 0, int stride = 1)
+    public static void ReadDeltaCompressedSequence<TByteReader>(ref this TByteReader reader, int predictorOrder, Span<double> values, int offset = 0, int stride = 1)
         where TByteReader : struct, IByteReader
     {
         unsafe
@@ -77,11 +77,11 @@ public static class DeltaSequences
 
                 // Read exponent+sign, store it in slot (reinterpreted as ulong)
                 {
-                    var bitReader = new BitReader<TByteReader>(reader);
+                    var bitReader = new BitReader();
                     uint prevExponent = 0;
                     for (var i = offset; i < values.Length; i += stride)
                     {
-                        prevExponent = ReadSignedDoubleExponent(ref bitReader, prevExponent);
+                        prevExponent = ReadSignedDoubleExponent(ref bitReader, ref reader, prevExponent);
                         valuesUlongPtr[i] = prevExponent;
                     }
                 }
@@ -106,9 +106,9 @@ public static class DeltaSequences
             }
         }
 
-        static uint ReadSignedDoubleExponent(ref BitReader<TByteReader> reader, uint prev)
+        static uint ReadSignedDoubleExponent(ref BitReader reader, ref TByteReader bytes, uint prev)
         {
-            var value = reader.ReadEliasDeltaGamma32();
+            var value = reader.ReadEliasDeltaGamma32(ref bytes);
             var exponent = value ^ prev;
             return exponent;
         }

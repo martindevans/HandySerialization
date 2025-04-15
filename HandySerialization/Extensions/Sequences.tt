@@ -96,7 +96,7 @@ public static class Sequences
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="<#=input#>"></param>
-    public static void WriteCompressedSequence<#=config.Name#><T>(this ref T writer, ReadOnlySpan<<#=config.TypeAlias#>> <#=input#>)
+    public static void WriteCompressedSequence<#=config.Name#><T>(ref this T writer, ReadOnlySpan<<#=config.TypeAlias#>> <#=input#>)
         where T : struct, IByteWriter
     {
         var prev = (<#=config.IntAlias#>)0;
@@ -113,7 +113,7 @@ public static class Sequences
         }
     }
 
-    public static void ReadCompressedSequence<#=config.Name#><T>(this ref T reader, Span<<#=config.TypeAlias#>> output)
+    public static void ReadCompressedSequence<#=config.Name#><T>(ref this T reader, Span<<#=config.TypeAlias#>> output)
         where T : struct, IByteReader
     {
         var r = new <#=readerType#><T>(output.Length);
@@ -128,14 +128,14 @@ public static class Sequences
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="<#=input#>"></param>
-    public static void WriteCompressedLengthPrefixedSequence<#=config.Name#><T>(this ref T writer, ReadOnlySpan<<#=config.TypeAlias#>> <#=input#>)
+    public static void WriteCompressedLengthPrefixedSequence<#=config.Name#><T>(ref this T writer, ReadOnlySpan<<#=config.TypeAlias#>> <#=input#>)
         where T : struct, IByteWriter
     {
         writer.WriteVariableUInt64((ulong)<#=input#>.Length);
         writer.WriteCompressedSequence<#=config.Name#>(<#=input#>);
     }
 
-    public static <#=readerType#><T> ReadCompressedLengthPrefixedSequence<#=config.Name#><T>(this ref T reader)
+    public static <#=readerType#><T> ReadCompressedLengthPrefixedSequence<#=config.Name#><T>(ref this T reader)
         where T : struct, IByteReader
     {
         return new <#=readerType#><T>((int)reader.ReadVariableUInt64());

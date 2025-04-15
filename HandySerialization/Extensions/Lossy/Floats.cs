@@ -9,7 +9,7 @@ public static class Floats
     /// <param name="writer"></param>
     /// <param name="f"></param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public static void WriteNormalizedFloat8<T>(this ref T writer, float f)
+    public static void WriteNormalizedFloat8<T>(ref this T writer, float f)
         where T : struct, IByteWriter
     {
         if (f is < 0 or > 1)
@@ -18,7 +18,7 @@ public static class Floats
         writer.Write((byte)(f * byte.MaxValue));
     }
 
-    public static float ReadNormalizedFloat8<T>(this ref T reader)
+    public static float ReadNormalizedFloat8<T>(ref this T reader)
         where T : struct, IByteReader
     {
         return reader.ReadUInt8() / (float)byte.MaxValue;
@@ -32,7 +32,7 @@ public static class Floats
     /// <param name="writer"></param>
     /// <param name="f"></param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public static void WriteNormalizedFloat16<T>(this ref T writer, float f)
+    public static void WriteNormalizedFloat16<T>(ref this T writer, float f)
         where T : struct, IByteWriter
     {
         if (f is < 0 or > 1)
@@ -41,7 +41,7 @@ public static class Floats
         writer.Write((ushort)(f * ushort.MaxValue));
     }
 
-    public static float ReadNormalizedFloat16<T>(this ref T reader)
+    public static float ReadNormalizedFloat16<T>(ref this T reader)
         where T : struct, IByteReader
     {
         return reader.ReadUInt16() / (float)ushort.MaxValue;
@@ -57,7 +57,7 @@ public static class Floats
     /// <param name="writer"></param>
     /// <param name="f"></param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public static void WriteNormalizedFloat24<T>(this ref T writer, float f)
+    public static void WriteNormalizedFloat24<T>(ref this T writer, float f)
         where T : struct, IByteWriter
     {
         if (f is < 0 or > 1)
@@ -74,7 +74,7 @@ public static class Floats
         writer.Write(c);
     }
 
-    public static float ReadNormalizedFloat24<T>(this ref T reader)
+    public static float ReadNormalizedFloat24<T>(ref this T reader)
         where T : struct, IByteReader
     {
         var a = reader.ReadUInt8();
@@ -94,13 +94,13 @@ public static class Floats
     /// <param name="min"></param>
     /// <param name="range"></param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public static void WriteRangeLimitedFloat8<T>(this ref T writer, float f, float min, float range)
+    public static void WriteRangeLimitedFloat8<T>(ref this T writer, float f, float min, float range)
         where T : struct, IByteWriter
     {
         writer.WriteNormalizedFloat8((f - min) / range);
     }
 
-    public static float ReadRangeLimitedFloat8<T>(this ref T reader, float min, float range)
+    public static float ReadRangeLimitedFloat8<T>(ref this T reader, float min, float range)
         where T : struct, IByteReader
     {
         return reader.ReadNormalizedFloat8() * range + min;
@@ -116,13 +116,13 @@ public static class Floats
     /// <param name="min"></param>
     /// <param name="range"></param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public static void WriteRangeLimitedFloat16<T>(this ref T writer, float f, float min, float range)
+    public static void WriteRangeLimitedFloat16<T>(ref this T writer, float f, float min, float range)
         where T : struct, IByteWriter
     {
         writer.WriteNormalizedFloat16((f - min) / range);
     }
 
-    public static float ReadRangeLimitedFloat16<T>(this ref T reader, float min, float range)
+    public static float ReadRangeLimitedFloat16<T>(ref this T reader, float min, float range)
         where T : struct, IByteReader
     {
         return reader.ReadNormalizedFloat16() * range + min;
@@ -138,13 +138,13 @@ public static class Floats
     /// <param name="min"></param>
     /// <param name="range"></param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public static void WriteRangeLimitedFloat24<T>(this ref T writer, float f, float min, float range)
+    public static void WriteRangeLimitedFloat24<T>(ref this T writer, float f, float min, float range)
         where T : struct, IByteWriter
     {
         writer.WriteNormalizedFloat24((f - min) / range);
     }
 
-    public static float ReadRangeLimitedFloat24<T>(this ref T reader, float min, float range)
+    public static float ReadRangeLimitedFloat24<T>(ref this T reader, float min, float range)
         where T : struct, IByteReader
     {
         return reader.ReadNormalizedFloat24() * range + min;

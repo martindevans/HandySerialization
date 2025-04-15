@@ -9,9 +9,10 @@ public static class RiceCodingExtensions
     /// </summary>
     /// <typeparam name="TBytes"></typeparam>
     /// <param name="writer"></param>
+    /// <param name="bytes"></param>
     /// <param name="value"></param>
     /// <param name="k"></param>
-    public static void WriteRiceCode32<TBytes>(ref this BitWriter<TBytes> writer, uint value, byte k)
+    public static void WriteRiceCode32<TBytes>(ref this BitWriter writer, ref TBytes bytes, uint value, byte k)
         where TBytes : struct, IByteWriter
     {
         var mask = (1u << k) - 1u;
@@ -19,15 +20,15 @@ public static class RiceCodingExtensions
         var q = value >> k;
         var r = value & mask;
 
-        writer.WriteUnaryInt((byte)q);
-        writer.WriteSmallUInt(r, k);
+        writer.WriteUnaryInt(ref bytes, (byte)q);
+        writer.WriteSmallUInt(ref bytes, r, k);
     }
 
-    public static uint ReadRiceCode32<TBytes>(ref this BitReader<TBytes> reader, byte k)
+    public static uint ReadRiceCode32<TBytes>(ref this BitReader reader, ref TBytes bytes, byte k)
         where TBytes : struct, IByteReader
     {
-        var q = (uint)reader.ReadUnaryInt();
-        var r = reader.ReadSmallUInt(k);
+        var q = (uint)reader.ReadUnaryInt(ref bytes);
+        var r = reader.ReadSmallUInt(ref bytes, k);
 
         return q << k | r;
     }

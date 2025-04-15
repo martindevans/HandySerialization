@@ -12,7 +12,7 @@ public static class Sequences
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="floats"></param>
-    public static void WriteCompressedSequenceFloat32<T>(this ref T writer, ReadOnlySpan<float> floats)
+    public static void WriteCompressedSequenceFloat32<T>(ref this T writer, ReadOnlySpan<float> floats)
         where T : struct, IByteWriter
     {
         var prev = (int)0;
@@ -25,7 +25,7 @@ public static class Sequences
         }
     }
 
-    public static void ReadCompressedSequenceFloat32<T>(this ref T reader, Span<float> output)
+    public static void ReadCompressedSequenceFloat32<T>(ref this T reader, Span<float> output)
         where T : struct, IByteReader
     {
         var r = new SequenceFloat32Reader<T>(output.Length);
@@ -40,14 +40,14 @@ public static class Sequences
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="floats"></param>
-    public static void WriteCompressedLengthPrefixedSequenceFloat32<T>(this ref T writer, ReadOnlySpan<float> floats)
+    public static void WriteCompressedLengthPrefixedSequenceFloat32<T>(ref this T writer, ReadOnlySpan<float> floats)
         where T : struct, IByteWriter
     {
         writer.WriteVariableUInt64((ulong)floats.Length);
         writer.WriteCompressedSequenceFloat32(floats);
     }
 
-    public static SequenceFloat32Reader<T> ReadCompressedLengthPrefixedSequenceFloat32<T>(this ref T reader)
+    public static SequenceFloat32Reader<T> ReadCompressedLengthPrefixedSequenceFloat32<T>(ref this T reader)
         where T : struct, IByteReader
     {
         return new SequenceFloat32Reader<T>((int)reader.ReadVariableUInt64());
@@ -96,7 +96,7 @@ public static class Sequences
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="doubles"></param>
-    public static void WriteCompressedSequenceFloat64<T>(this ref T writer, ReadOnlySpan<double> doubles)
+    public static void WriteCompressedSequenceFloat64<T>(ref this T writer, ReadOnlySpan<double> doubles)
         where T : struct, IByteWriter
     {
         var prev = (long)0;
@@ -109,7 +109,7 @@ public static class Sequences
         }
     }
 
-    public static void ReadCompressedSequenceFloat64<T>(this ref T reader, Span<double> output)
+    public static void ReadCompressedSequenceFloat64<T>(ref this T reader, Span<double> output)
         where T : struct, IByteReader
     {
         var r = new SequenceFloat64Reader<T>(output.Length);
@@ -124,14 +124,14 @@ public static class Sequences
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="doubles"></param>
-    public static void WriteCompressedLengthPrefixedSequenceFloat64<T>(this ref T writer, ReadOnlySpan<double> doubles)
+    public static void WriteCompressedLengthPrefixedSequenceFloat64<T>(ref this T writer, ReadOnlySpan<double> doubles)
         where T : struct, IByteWriter
     {
         writer.WriteVariableUInt64((ulong)doubles.Length);
         writer.WriteCompressedSequenceFloat64(doubles);
     }
 
-    public static SequenceFloat64Reader<T> ReadCompressedLengthPrefixedSequenceFloat64<T>(this ref T reader)
+    public static SequenceFloat64Reader<T> ReadCompressedLengthPrefixedSequenceFloat64<T>(ref this T reader)
         where T : struct, IByteReader
     {
         return new SequenceFloat64Reader<T>((int)reader.ReadVariableUInt64());
@@ -180,7 +180,7 @@ public static class Sequences
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="ints"></param>
-    public static void WriteCompressedSequenceInt32<T>(this ref T writer, ReadOnlySpan<int> ints)
+    public static void WriteCompressedSequenceInt32<T>(ref this T writer, ReadOnlySpan<int> ints)
         where T : struct, IByteWriter
     {
         var prev = (int)0;
@@ -193,7 +193,7 @@ public static class Sequences
         }
     }
 
-    public static void ReadCompressedSequenceInt32<T>(this ref T reader, Span<int> output)
+    public static void ReadCompressedSequenceInt32<T>(ref this T reader, Span<int> output)
         where T : struct, IByteReader
     {
         var r = new SequenceInt32Reader<T>(output.Length);
@@ -208,14 +208,14 @@ public static class Sequences
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="ints"></param>
-    public static void WriteCompressedLengthPrefixedSequenceInt32<T>(this ref T writer, ReadOnlySpan<int> ints)
+    public static void WriteCompressedLengthPrefixedSequenceInt32<T>(ref this T writer, ReadOnlySpan<int> ints)
         where T : struct, IByteWriter
     {
         writer.WriteVariableUInt64((ulong)ints.Length);
         writer.WriteCompressedSequenceInt32(ints);
     }
 
-    public static SequenceInt32Reader<T> ReadCompressedLengthPrefixedSequenceInt32<T>(this ref T reader)
+    public static SequenceInt32Reader<T> ReadCompressedLengthPrefixedSequenceInt32<T>(ref this T reader)
         where T : struct, IByteReader
     {
         return new SequenceInt32Reader<T>((int)reader.ReadVariableUInt64());
@@ -264,7 +264,7 @@ public static class Sequences
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="uints"></param>
-    public static void WriteCompressedSequenceUInt32<T>(this ref T writer, ReadOnlySpan<uint> uints)
+    public static void WriteCompressedSequenceUInt32<T>(ref this T writer, ReadOnlySpan<uint> uints)
         where T : struct, IByteWriter
     {
         var prev = (uint)0;
@@ -277,7 +277,7 @@ public static class Sequences
         }
     }
 
-    public static void ReadCompressedSequenceUInt32<T>(this ref T reader, Span<uint> output)
+    public static void ReadCompressedSequenceUInt32<T>(ref this T reader, Span<uint> output)
         where T : struct, IByteReader
     {
         var r = new SequenceUInt32Reader<T>(output.Length);
@@ -292,14 +292,14 @@ public static class Sequences
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="uints"></param>
-    public static void WriteCompressedLengthPrefixedSequenceUInt32<T>(this ref T writer, ReadOnlySpan<uint> uints)
+    public static void WriteCompressedLengthPrefixedSequenceUInt32<T>(ref this T writer, ReadOnlySpan<uint> uints)
         where T : struct, IByteWriter
     {
         writer.WriteVariableUInt64((ulong)uints.Length);
         writer.WriteCompressedSequenceUInt32(uints);
     }
 
-    public static SequenceUInt32Reader<T> ReadCompressedLengthPrefixedSequenceUInt32<T>(this ref T reader)
+    public static SequenceUInt32Reader<T> ReadCompressedLengthPrefixedSequenceUInt32<T>(ref this T reader)
         where T : struct, IByteReader
     {
         return new SequenceUInt32Reader<T>((int)reader.ReadVariableUInt64());
@@ -348,7 +348,7 @@ public static class Sequences
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="longs"></param>
-    public static void WriteCompressedSequenceInt64<T>(this ref T writer, ReadOnlySpan<long> longs)
+    public static void WriteCompressedSequenceInt64<T>(ref this T writer, ReadOnlySpan<long> longs)
         where T : struct, IByteWriter
     {
         var prev = (long)0;
@@ -361,7 +361,7 @@ public static class Sequences
         }
     }
 
-    public static void ReadCompressedSequenceInt64<T>(this ref T reader, Span<long> output)
+    public static void ReadCompressedSequenceInt64<T>(ref this T reader, Span<long> output)
         where T : struct, IByteReader
     {
         var r = new SequenceInt64Reader<T>(output.Length);
@@ -376,14 +376,14 @@ public static class Sequences
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="longs"></param>
-    public static void WriteCompressedLengthPrefixedSequenceInt64<T>(this ref T writer, ReadOnlySpan<long> longs)
+    public static void WriteCompressedLengthPrefixedSequenceInt64<T>(ref this T writer, ReadOnlySpan<long> longs)
         where T : struct, IByteWriter
     {
         writer.WriteVariableUInt64((ulong)longs.Length);
         writer.WriteCompressedSequenceInt64(longs);
     }
 
-    public static SequenceInt64Reader<T> ReadCompressedLengthPrefixedSequenceInt64<T>(this ref T reader)
+    public static SequenceInt64Reader<T> ReadCompressedLengthPrefixedSequenceInt64<T>(ref this T reader)
         where T : struct, IByteReader
     {
         return new SequenceInt64Reader<T>((int)reader.ReadVariableUInt64());
@@ -432,7 +432,7 @@ public static class Sequences
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="ulongs"></param>
-    public static void WriteCompressedSequenceUInt64<T>(this ref T writer, ReadOnlySpan<ulong> ulongs)
+    public static void WriteCompressedSequenceUInt64<T>(ref this T writer, ReadOnlySpan<ulong> ulongs)
         where T : struct, IByteWriter
     {
         var prev = (ulong)0;
@@ -445,7 +445,7 @@ public static class Sequences
         }
     }
 
-    public static void ReadCompressedSequenceUInt64<T>(this ref T reader, Span<ulong> output)
+    public static void ReadCompressedSequenceUInt64<T>(ref this T reader, Span<ulong> output)
         where T : struct, IByteReader
     {
         var r = new SequenceUInt64Reader<T>(output.Length);
@@ -460,14 +460,14 @@ public static class Sequences
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="ulongs"></param>
-    public static void WriteCompressedLengthPrefixedSequenceUInt64<T>(this ref T writer, ReadOnlySpan<ulong> ulongs)
+    public static void WriteCompressedLengthPrefixedSequenceUInt64<T>(ref this T writer, ReadOnlySpan<ulong> ulongs)
         where T : struct, IByteWriter
     {
         writer.WriteVariableUInt64((ulong)ulongs.Length);
         writer.WriteCompressedSequenceUInt64(ulongs);
     }
 
-    public static SequenceUInt64Reader<T> ReadCompressedLengthPrefixedSequenceUInt64<T>(this ref T reader)
+    public static SequenceUInt64Reader<T> ReadCompressedLengthPrefixedSequenceUInt64<T>(ref this T reader)
         where T : struct, IByteReader
     {
         return new SequenceUInt64Reader<T>((int)reader.ReadVariableUInt64());

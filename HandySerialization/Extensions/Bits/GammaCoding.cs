@@ -10,23 +10,24 @@ public static class GammaCodingExtensions
     /// </summary>
     /// <typeparam name="TBytes"></typeparam>
     /// <param name="writer"></param>
+    /// <param name="bytes"></param>
     /// <param name="value"></param>
-    public static void WriteEliasGamma32<TBytes>(ref this BitWriter<TBytes> writer, uint value)
+    public static void WriteEliasGamma32<TBytes>(ref this BitWriter writer, ref TBytes bytes, uint value)
         where TBytes : struct, IByteWriter
     {
         // Write out number of bits needed
         var bits = BitTwiddle.BitsNeeded32(value);
-        writer.WriteUnaryInt(bits);
+        writer.WriteUnaryInt(ref bytes, bits);
 
         // Write out the number itself
-        writer.WriteSmallUInt(value, bits);
+        writer.WriteSmallUInt(ref bytes, value, bits);
     }
 
-    public static uint ReadEliasGamma32<TBytes>(ref this BitReader<TBytes> reader)
+    public static uint ReadEliasGamma32<TBytes>(ref this BitReader reader, ref TBytes bytes)
         where TBytes : struct, IByteReader
     {
-        var bits = reader.ReadUnaryInt();
-        return reader.ReadSmallUInt(bits);
+        var bits = reader.ReadUnaryInt(ref bytes);
+        return reader.ReadSmallUInt(ref bytes, bits);
     }
 
     /// <summary>
@@ -35,22 +36,23 @@ public static class GammaCodingExtensions
     /// </summary>
     /// <typeparam name="TBytes"></typeparam>
     /// <param name="writer"></param>
+    /// <param name="bytes"></param>
     /// <param name="value"></param>
-    public static void WriteEliasDeltaGamma32<TBytes>(ref this BitWriter<TBytes> writer, uint value)
+    public static void WriteEliasDeltaGamma32<TBytes>(ref this BitWriter writer, ref TBytes bytes, uint value)
         where TBytes : struct, IByteWriter
     {
         // Write out number of bits needed
         var bits = BitTwiddle.BitsNeeded32(value);
-        writer.WriteEliasGamma32(bits);
+        writer.WriteEliasGamma32(ref bytes, bits);
 
         // Write out the number itself
-        writer.WriteSmallUInt(value, bits);
+        writer.WriteSmallUInt(ref bytes, value, bits);
     }
 
-    public static uint ReadEliasDeltaGamma32<TBytes>(ref this BitReader<TBytes> reader)
+    public static uint ReadEliasDeltaGamma32<TBytes>(ref this BitReader reader, ref TBytes bytes)
         where TBytes : struct, IByteReader
     {
-        var bits = reader.ReadEliasGamma32();
-        return reader.ReadSmallUInt(bits);
+        var bits = reader.ReadEliasGamma32(ref bytes);
+        return reader.ReadSmallUInt(ref bytes, bits);
     }
 }

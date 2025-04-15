@@ -2,20 +2,20 @@
 
 public static class VariableLength
 {
-    public static void WriteVariableInt64<T>(this ref T writer, long l)
+    public static void WriteVariableInt64<T>(ref this T writer, long l)
         where T : struct, IByteWriter
     {
         writer.WriteVariableUInt64(l.ZigZag());
     }
 
-    public static long ReadVariableInt64<T>(this ref T reader)
+    public static long ReadVariableInt64<T>(ref this T reader)
         where T : struct, IByteReader
     {
         return reader.ReadVariableUInt64().DecodeZigZag();
     }
 
 
-    public static void WriteVariableUInt64<T>(this ref T writer, ulong u)
+    public static void WriteVariableUInt64<T>(ref this T writer, ulong u)
         where T : struct, IByteWriter
     {
         var count = 0;
@@ -35,7 +35,7 @@ public static class VariableLength
         writer.Write(bytes[..count]);
     }
 
-    public static ulong ReadVariableUInt64<T>(this ref T reader)
+    public static ulong ReadVariableUInt64<T>(ref this T reader)
         where T : struct, IByteReader
     {
         ulong accumulator = 0;

@@ -9,13 +9,13 @@ public static class Vectors
     /// <param name="writer"></param>
     /// <param name="x"></param>
     /// <param name="y"></param>
-    public static void WriteNormalizedVector2<T>(this ref T writer, float x, float y)
+    public static void WriteNormalizedVector2<T>(ref this T writer, float x, float y)
         where T : struct, IByteWriter
     {
         writer.WriteNormalizedVector2(new Vector2(x, y));
     }
 
-    public static void ReadNormalizedVector2<T>(this ref T reader, out float x, out float y)
+    public static void ReadNormalizedVector2<T>(ref this T reader, out float x, out float y)
         where T : struct, IByteReader
     {
         var v = reader.ReadNormalizedVector2();
@@ -30,14 +30,14 @@ public static class Vectors
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="xy"></param>
-    public static void WriteNormalizedVector2<T>(this ref T writer, Vector2 xy)
+    public static void WriteNormalizedVector2<T>(ref this T writer, Vector2 xy)
         where T : struct, IByteWriter
     {
         var atan = MathF.Atan2(xy.Y, xy.X);
         writer.WriteRangeLimitedFloat16(atan, -MathF.PI, MathF.PI * 2);
     }
 
-    public static Vector2 ReadNormalizedVector2<T>(this ref T reader)
+    public static Vector2 ReadNormalizedVector2<T>(ref this T reader)
         where T : struct, IByteReader
     {
         var atan = reader.ReadRangeLimitedFloat16(-MathF.PI, MathF.PI * 2);
@@ -56,13 +56,13 @@ public static class Vectors
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <param name="z"></param>
-    public static void WriteNormalizedVector3<T>(this ref T writer, float x, float y, float z)
+    public static void WriteNormalizedVector3<T>(ref this T writer, float x, float y, float z)
         where T : struct, IByteWriter
     {
         writer.WriteNormalizedVector3(new Vector3(x, y, z));
     }
 
-    public static void ReadNormalizedVector3<T>(this ref T reader, out float x, out float y, out float z)
+    public static void ReadNormalizedVector3<T>(ref this T reader, out float x, out float y, out float z)
         where T : struct, IByteReader
     {
         var v = reader.ReadNormalizedVector3();
@@ -78,7 +78,7 @@ public static class Vectors
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="xyz"></param>
-    public static void WriteNormalizedVector3<T>(this ref T writer, Vector3 xyz)
+    public static void WriteNormalizedVector3<T>(ref this T writer, Vector3 xyz)
         where T : struct, IByteWriter
     {
         // http://aras-p.info/texts/CompactNormalStorage.html
@@ -93,7 +93,7 @@ public static class Vectors
         writer.Write(enc.Y);
     }
 
-    public static Vector3 ReadNormalizedVector3<T>(this ref T reader)
+    public static Vector3 ReadNormalizedVector3<T>(ref this T reader)
         where T : struct, IByteReader
     {
         // http://aras-p.info/texts/CompactNormalStorage.html
@@ -127,7 +127,7 @@ public static class Vectors
     /// <typeparam name="T"></typeparam>
     /// <param name="writer"></param>
     /// <param name="q"></param>
-    public static void WriteCompressedQuaternion<T>(this ref T writer, Quaternion q)
+    public static void WriteCompressedQuaternion<T>(ref this T writer, Quaternion q)
         where T : struct, IByteWriter
     {
         const float oneOverSqrt2 = 0.70710678118f;
@@ -205,7 +205,7 @@ public static class Vectors
         }
     }
 
-    public static Quaternion ReadCompressedQuaternion<T>(this ref T reader)
+    public static Quaternion ReadCompressedQuaternion<T>(ref this T reader)
         where T : struct, IByteReader
     {
         const float oneOverSqrt2 = 0.7071067f;
