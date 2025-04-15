@@ -327,7 +327,7 @@ public class FloatTests
     {
         var rng = new Random(5683656);
 
-        const int count = 1000;
+        const int count = 10000;
         var sequence = new double[count];
         var output = new double[count];
         for (var i = 0; i < count; i++)
@@ -339,13 +339,50 @@ public class FloatTests
                 else
                     sequence[j] = sequence[j - 1] + (rng.NextDouble() - 0.5) * 1_000;
             }
-
-            var serializer = new TestWriterReader();
-
-            serializer.WriteDeltaCompressedSequence(3, sequence);
-            serializer.ReadDeltaCompressedSequence(3, output);
-
-            Assert.IsTrue(sequence.SequenceEqual(output));
         }
+
+        var serializer = new TestWriterReader();
+
+        serializer.WriteDeltaCompressedSequence(3, sequence);
+        serializer.ReadDeltaCompressedSequence(3, output);
+
+        Assert.IsTrue(sequence.SequenceEqual(output));
+    }
+
+    [TestMethod]
+    public void RoundTripFloatSequenceFloat64_Delta_Stride()
+    {
+        var rng = new Random(5683656);
+
+        const int count = 3000;
+        Assert.IsTrue(count % 3 == 0);
+
+        var sequence = new double[count];
+        var output = new double[count];
+        for (var i = 0; i < count; i++)
+        {
+            for (var j = 0; j < sequence.Length; j++)
+            {
+                if (j == 0)
+                    sequence[j] = (rng.NextDouble() - 0.5) * 1_000;
+                else
+                    sequence[j] = sequence[j - 1] + (rng.NextDouble() - 0.5) * 1_000;
+            }
+        }
+
+        var serializer = new TestWriterReader();
+
+        // Write out data with 3 parts, strided to step over each other. As if it's e.g. double3
+        serializer.WriteDeltaCompressedSequence(3, sequence, offset:0, stride:3);
+        serializer.WriteDeltaCompressedSequence(3, sequence, offset:1, stride:3);
+        serializer.WriteDeltaCompressedSequence(3, sequence, offset:2, stride:3);
+
+        // Read that data, all into the same array
+        serializer.ReadDeltaCompressedSequence(3, output, offset: 0, stride: 3);
+        serializer.ReadDeltaCompressedSequence(3, output, offset: 1, stride: 3);
+        serializer.ReadDeltaCompressedSequence(3, output, offset: 2, stride: 3);
+
+        // Final result should be the same as the input
+        Assert.IsTrue(sequence.SequenceEqual(output));
     }
 }
