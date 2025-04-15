@@ -246,21 +246,24 @@ public class OrbitDataTests
 
     private static void CustomWrite3(OrbitDataPage page, Stream stream)
     {
-        using var deflate = new DeflateStream(stream, CompressionLevel.Fastest, true);
+        //using var deflate = new DeflateStream(stream, CompressionLevel.Fastest, true);
 
-        var writer = new StreamByteWriter(deflate);
+        var writer = new StreamByteWriter(stream);
 
         writer.Write((ushort)page.Positions.Count);
         writer.Write(page.ID);
 
-        writer.WriteDeltaCompressedSequence(8, MemoryMarshal.Cast<double3, double>(page.Velocities.ToArray()), 0, 3);
-        writer.WriteDeltaCompressedSequence(8, MemoryMarshal.Cast<double3, double>(page.Velocities.ToArray()), 1, 3);
-        writer.WriteDeltaCompressedSequence(8, MemoryMarshal.Cast<double3, double>(page.Velocities.ToArray()), 2, 3);
+        const byte pOrder = 4;
+        const byte vOrder = 4;
 
-        writer.WriteDeltaCompressedSequence(8, MemoryMarshal.Cast<double,  double>(page.Timestamps.ToArray()));
+        writer.WriteDeltaCompressedSequence(vOrder, MemoryMarshal.Cast<double3, double>(page.Velocities.ToArray()), 0, 3);
+        writer.WriteDeltaCompressedSequence(vOrder, MemoryMarshal.Cast<double3, double>(page.Velocities.ToArray()), 1, 3);
+        writer.WriteDeltaCompressedSequence(vOrder, MemoryMarshal.Cast<double3, double>(page.Velocities.ToArray()), 2, 3);
 
-        writer.WriteDeltaCompressedSequence(8, MemoryMarshal.Cast<double3, double>(page.Positions.ToArray()), 0, 3);
-        writer.WriteDeltaCompressedSequence(8, MemoryMarshal.Cast<double3, double>(page.Positions.ToArray()), 1, 3);
-        writer.WriteDeltaCompressedSequence(8, MemoryMarshal.Cast<double3, double>(page.Positions.ToArray()), 2, 3);
+        writer.WriteDeltaCompressedSequence(1, MemoryMarshal.Cast<double,  double>(page.Timestamps.ToArray()));
+
+        writer.WriteDeltaCompressedSequence(pOrder, MemoryMarshal.Cast<double3, double>(page.Positions.ToArray()), 0, 3);
+        writer.WriteDeltaCompressedSequence(pOrder, MemoryMarshal.Cast<double3, double>(page.Positions.ToArray()), 1, 3);
+        writer.WriteDeltaCompressedSequence(pOrder, MemoryMarshal.Cast<double3, double>(page.Positions.ToArray()), 2, 3);
     }
 }

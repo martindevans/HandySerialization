@@ -5,9 +5,10 @@ internal static class BitTwiddle
 {
     public static uint LeadingZeros(uint x)
     {
-#if NET5_0_OR_GREATER
-        return (uint)BitOperations.LeadingZeroCount(x);
-#else
+//#if NET5_0_OR_GREATER
+//        return (uint)BitOperations.LeadingZeroCount(x);
+//#endif
+
         const uint numIntBits = sizeof(uint) * 8; //compile time constant
         
         //do the smearing
@@ -24,12 +25,11 @@ internal static class BitTwiddle
         x += x >> 8;
         x += x >> 16;
         return numIntBits - (x & 0x0000003F); //subtract # of 1s from 32
-#endif
     }
 
     public static byte BitsNeeded32(uint value)
     {
-        return (byte)(32 - BitTwiddle.LeadingZeros(value));
+        return (byte)(32 - LeadingZeros(value));
     }
 
     public static uint Exponent(double value)

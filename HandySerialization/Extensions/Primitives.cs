@@ -41,7 +41,7 @@ public static class Primitives
     public static void Write<T>(this ref T writer, byte b)
         where T : struct, IByteWriter
     {
-        Span<byte> dest = [ b ];
+        Span<byte> dest = stackalloc byte[] { b };
         writer.Write(dest);
     }
 
