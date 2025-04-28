@@ -1,4 +1,5 @@
-﻿using System.Buffers.Binary;
+﻿using HandySerialization.Unions;
+using System.Buffers.Binary;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -70,38 +71,42 @@ public static class Primitives
     public static void Write<T>(ref this T writer, ushort s)
         where T : struct, IByteWriter
     {
-        Span<byte> span = stackalloc byte[2];
-        BinaryPrimitives.WriteUInt16BigEndian(span, s);
-
-        writer.Write(span);
+        var u = new Union16 { RawUshort = s };
+        writer.Write(u.NetworkByte0);
+        writer.Write(u.NetworkByte1);
     }
 
     public static ushort ReadUInt16<T>(ref this T reader)
         where T : struct, IByteReader
     {
-        Span<byte> span = stackalloc byte[2];
-        reader.ReadBytes(span);
+        var u = new Union16
+        {
+            NetworkByte0 = ReadUInt8(ref reader),
+            NetworkByte1 = ReadUInt8(ref reader)
+        };
 
-        return BinaryPrimitives.ReadUInt16BigEndian(span);
+        return u.RawUshort;
     }
 
 
     public static void Write<T>(ref this T writer, short s)
         where T : struct, IByteWriter
     {
-        Span<byte> span = stackalloc byte[2];
-        BinaryPrimitives.WriteInt16BigEndian(span, s);
-
-        writer.Write(span);
+        var u = new Union16 { RawShort = s };
+        writer.Write(u.NetworkByte0);
+        writer.Write(u.NetworkByte1);
     }
 
     public static short ReadInt16<T>(ref this T reader)
         where T : struct, IByteReader
     {
-        Span<byte> span = stackalloc byte[2];
-        reader.ReadBytes(span);
+        var u = new Union16
+        {
+            NetworkByte0 = ReadUInt8(ref reader),
+            NetworkByte1 = ReadUInt8(ref reader)
+        };
 
-        return BinaryPrimitives.ReadInt16BigEndian(span);
+        return u.RawShort;
     }
 
 
