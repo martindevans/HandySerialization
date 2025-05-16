@@ -138,6 +138,10 @@ public struct SequenceFloat32Reader<T>
 }
 ```
 
+## Delete Sequences
+
+This is a special purpose sequence encoder (currently `double` only) which stores the change in value from one to the next, this can be very small (e.g. 30% of the size) for appropriate sequences. The "order" of the predictor can be selected, e.g. writing out the delta of the delta of the delta (3rd order).
+
 ## Lossy Encodings
 
 HandySerialization does include some "lossy" encodings, all of them are contained within the `HandySerialization.Extensions.Lossy` namespace.
@@ -174,3 +178,19 @@ public static void WriteCompressedQuaternion<T>(this ref T writer, Quaternion q)
 ```
 
 Write a quaternion using 56 bits (identity quaternion is a special case and only requires 8 bits).
+
+## Bit Oriented Writers
+
+It is possible to write out individual bits instead of whole bytes by using a `BitWriter`. For example:
+
+```csharp
+var bitWriter = new BitWriter();
+{
+    bitWriter.WriteUInt4(ref writer, 3u); // Write a 4 bit number
+    bitWriter.WriteUInt3(ref writer, 1u); // Write a 3 bit number
+    bitWriter.WriteUInt3(ref writer, 1u); // Write a 3 bit number
+}
+bitWriter.Flush(ref writer); // Flsuh to byte writer, since 10 bits were written this will pad to 16 bits.
+```
+
+The bit writer has a small internal buffer which is automatically flushed to the underlying writer when it is full. The final flush call writes out any remaining bits with padding to the nearest byte.
