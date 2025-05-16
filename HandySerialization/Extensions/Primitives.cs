@@ -1,5 +1,4 @@
 ﻿using HandySerialization.Unions;
-using System.Buffers.Binary;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -72,18 +71,14 @@ public static class Primitives
         where T : struct, IByteWriter
     {
         var u = new Union16 { RawUshort = s };
-        writer.Write(u.NetworkByte0);
-        writer.Write(u.NetworkByte1);
+        u.Write(ref writer);
     }
 
     public static ushort ReadUInt16<T>(ref this T reader)
         where T : struct, IByteReader
     {
-        var u = new Union16
-        {
-            NetworkByte0 = ReadUInt8(ref reader),
-            NetworkByte1 = ReadUInt8(ref reader)
-        };
+        var u = new Union16();
+        u.Read(ref reader);
 
         return u.RawUshort;
     }
@@ -93,18 +88,14 @@ public static class Primitives
         where T : struct, IByteWriter
     {
         var u = new Union16 { RawShort = s };
-        writer.Write(u.NetworkByte0);
-        writer.Write(u.NetworkByte1);
+        u.Write(ref writer);
     }
 
     public static short ReadInt16<T>(ref this T reader)
         where T : struct, IByteReader
     {
-        var u = new Union16
-        {
-            NetworkByte0 = ReadUInt8(ref reader),
-            NetworkByte1 = ReadUInt8(ref reader)
-        };
+        var u = new Union16();
+        u.Read(ref reader);
 
         return u.RawShort;
     }
@@ -113,76 +104,68 @@ public static class Primitives
     public static void Write<T>(ref this T writer, uint i)
         where T : struct, IByteWriter
     {
-        Span<byte> span = stackalloc byte[4];
-        BinaryPrimitives.WriteUInt32BigEndian(span, i);
-
-        writer.Write(span);
+        var u = new Union32 { RawUint = i };
+        u.Write(ref writer);
     }
 
     public static uint ReadUInt32<T>(ref this T reader)
         where T : struct, IByteReader
     {
-        Span<byte> span = stackalloc byte[4];
-        reader.ReadBytes(span);
+        var u = new Union32();
+        u.Read(ref reader);
 
-        return BinaryPrimitives.ReadUInt32BigEndian(span);
+        return u.RawUint;
     }
 
 
     public static void Write<T>(ref this T writer, int i)
         where T : struct, IByteWriter
     {
-        Span<byte> span = stackalloc byte[4];
-        BinaryPrimitives.WriteInt32BigEndian(span, i);
-
-        writer.Write(span);
+        var u = new Union32 { RawInt = i };
+        u.Write(ref writer);
     }
 
     public static int ReadInt32<T>(ref this T reader)
         where T : struct, IByteReader
     {
-        Span<byte> span = stackalloc byte[4];
-        reader.ReadBytes(span);
+        var u = new Union32();
+        u.Read(ref reader);
 
-        return BinaryPrimitives.ReadInt32BigEndian(span);
+        return u.RawInt;
     }
 
 
     public static void Write<T>(ref this T writer, ulong l)
         where T : struct, IByteWriter
     {
-        Span<byte> span = stackalloc byte[8];
-        BinaryPrimitives.WriteUInt64BigEndian(span, l);
-
-        writer.Write(span);
+        var u = new Union64 { RawUlong = l };
+        u.Write(ref writer);
     }
 
     public static ulong ReadUInt64<T>(ref this T reader)
         where T : struct, IByteReader
     {
-        Span<byte> span = stackalloc byte[8];
-        reader.ReadBytes(span);
+        var u = new Union64();
+        u.Read(ref reader);
 
-        return BinaryPrimitives.ReadUInt64BigEndian(span);
+        return u.RawUlong;
     }
 
 
     public static void Write<T>(ref this T writer, long l)
         where T : struct, IByteWriter
     {
-        Span<byte> span = stackalloc byte[8];
-        BinaryPrimitives.WriteInt64BigEndian(span, l);
-
-        writer.Write(span);
+        var u = new Union64 { RawLong = l };
+        u.Write(ref writer);
     }
 
     public static long ReadInt64<T>(ref this T reader)
         where T : struct, IByteReader
     {
-        Span<byte> span = stackalloc byte[8];
-        reader.ReadBytes(span);
+        var u = new Union64();
+        u.Read(ref reader);
 
-        return BinaryPrimitives.ReadInt64BigEndian(span);
+        return u.RawLong;
     }
 
 
@@ -286,19 +269,17 @@ public static class Primitives
     public static void Write<T>(ref this T writer, char c)
         where T : struct, IByteWriter
     {
-        Span<byte> span = stackalloc byte[2];
-        BinaryPrimitives.WriteUInt16BigEndian(span, c);
-
-        writer.Write(span);
+        var u = new Union16 { RawChar = c };
+        u.Write(ref writer);
     }
 
     public static char ReadChar<T>(ref this T reader)
         where T : struct, IByteReader
     {
-        Span<byte> span = stackalloc byte[2];
-        reader.ReadBytes(span);
+        var u = new Union16();
+        u.Read(ref reader);
 
-        return (char)BinaryPrimitives.ReadUInt16BigEndian(span);
+        return u.RawChar;
     }
 
 
