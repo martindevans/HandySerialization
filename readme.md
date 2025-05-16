@@ -138,9 +138,11 @@ public struct SequenceFloat32Reader<T>
 }
 ```
 
-## Delete Sequences
+## Delta Sequences
 
-This is a special purpose sequence encoder (currently `double` only) which stores the change in value from one to the next, this can be very small (e.g. 30% of the size) for appropriate sequences. The "order" of the predictor can be selected, e.g. writing out the delta of the delta of the delta (3rd order).
+This is a special purpose sequence encoder (currently `double` only) which stores the change in value from one to the next, this can be very small (e.g. 30% of the size) for appropriate sequences.
+
+The "order" of the predictor can be selected, e.g. writing out the delta of the delta of the delta would be a 3rd order predictor. Selecting an order which is too small will result in a _slightly_ larger encoding than possible, selecting an order which is too large will explode into a _much_ larger encoding than necessary.
 
 ## Lossy Encodings
 
