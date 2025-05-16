@@ -1,6 +1,6 @@
 # HandySerialization
 
-HandySerialization is a simple, byte oriented, binary serialization library.
+HandySerialization is a simple binary serialization library.
 
 ## `IByteReader` & `IByteWriter`
 
