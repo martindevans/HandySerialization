@@ -117,19 +117,74 @@ public struct BitReader
     private byte _buffer;
     private int _bits;
 
+    private void Fill<TBytes>(ref TBytes reader)
+        where TBytes : struct, IByteReader
+    {
+        _buffer = reader.ReadUInt8();
+        _bits = 8;
+    }
+
     public bool Read<TBytes>(ref TBytes reader)
         where TBytes : struct, IByteReader
     {
         if (_bits == 0)
-        {
-            _buffer = reader.ReadUInt8();
-            _bits = 8;
-        }
+            Fill(ref reader);
 
         var value = (_buffer & 0b1000_0000) != 0;
         _buffer <<= 1;
         _bits--;
 
         return value;
+    }
+
+    public ulong Read<TBytes>(ref TBytes reader, uint count)
+        where TBytes : struct, IByteReader
+    {
+        if (count > 64)
+            throw new ArgumentOutOfRangeException(nameof(count), "Cannot read more than 64 bits");
+
+        ulong result = 0;
+        while (count > 0)
+        {
+            if (_bits == 0)
+            {
+                // Read bytes directly from upstream
+                if (count > 32)
+                    AccumulateIntoResult(ref result, ref count, reader.ReadUInt32(), 32);
+                if (count > 16)
+                    AccumulateIntoResult(ref result, ref count, reader.ReadUInt16(), 16);
+                if (count > 8)
+                    AccumulateIntoResult(ref result, ref count, reader.ReadUInt8(), 8);
+
+                Fill(ref reader);
+            }
+
+            if (count > _bits)
+            {
+                AccumulateIntoResult(ref result, ref count, (uint)_buffer >> (8 - _bits), (byte)_bits);
+                _bits = 0;
+            }
+            else
+            {
+                var bitsToAdd = count;
+                AccumulateIntoResult(ref result, ref count, (uint)_buffer >> (8 - (int)count), (byte)bitsToAdd);
+                _buffer <<= (int)bitsToAdd;
+                _bits -= (int)bitsToAdd;
+            }
+        }
+
+        return result;
+
+        void AccumulateIntoResult(ref ulong result, ref uint count, uint input, byte bits)
+        {
+            // Make space in result buffer
+            result <<= bits;
+
+            // Move in bits from buffer
+            result |= input;
+
+            // Reduce count of remaining needed bits
+            count -= bits;
+        }
     }
 }

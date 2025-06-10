@@ -27,7 +27,7 @@ public static class GammaCodingExtensions
         where TBytes : struct, IByteReader
     {
         var bits = reader.ReadUnaryInt(ref bytes);
-        return reader.ReadSmallUInt(ref bytes, bits);
+        return (uint)reader.ReadSmallUInt(ref bytes, bits);
     }
 
     /// <summary>
@@ -53,6 +53,6 @@ public static class GammaCodingExtensions
         where TBytes : struct, IByteReader
     {
         var bits = reader.ReadEliasGamma32(ref bytes);
-        return reader.ReadSmallUInt(ref bytes, bits);
+        return (uint)reader.ReadSmallUInt(ref bytes, bits);
     }
 }

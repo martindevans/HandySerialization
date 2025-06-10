@@ -28,7 +28,7 @@ public static class RiceCodingExtensions
         where TBytes : struct, IByteReader
     {
         var q = (uint)reader.ReadUnaryInt(ref bytes);
-        var r = reader.ReadSmallUInt(ref bytes, k);
+        var r = (uint)reader.ReadSmallUInt(ref bytes, k);
 
         return q << k | r;
     }
