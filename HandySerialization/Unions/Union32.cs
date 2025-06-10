@@ -1,4 +1,5 @@
 ﻿using HandySerialization.Extensions;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace HandySerialization.Unions;
@@ -14,6 +15,7 @@ internal struct Union32
     [FieldOffset(2)] public byte RawByte2;
     [FieldOffset(3)] public byte RawByte3;
 
+    [ExcludeFromCodeCoverage]
     public void Write<T>(ref T writer)
         where T : struct, IByteWriter
     {
@@ -33,6 +35,7 @@ internal struct Union32
         }
     }
 
+    [ExcludeFromCodeCoverage]
     public void Read<T>(ref T reader)
         where T : struct, IByteReader
     {
