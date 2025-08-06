@@ -1,4 +1,6 @@
-﻿namespace HandySerialization.Extensions;
+﻿using System.Diagnostics;
+
+namespace HandySerialization.Extensions;
 
 public static class Vectors
 {
@@ -251,8 +253,7 @@ public static class Vectors
         try
         {
             // Write big int to byte array. This cannot fail, since we got the size above
-            if (!b.TryWriteBytes(bytesArr, out var bytesWritten))
-                throw new InvalidOperationException("Failed to serialize BigInteger");
+            Debug.Assert(b.TryWriteBytes(bytesArr, out var bytesWritten));
 
             // Write length prefixed data
             writer.WriteVariableUInt64(checked((ulong)bytesWritten));

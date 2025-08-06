@@ -295,4 +295,20 @@ public static class Primitives
     {
         return new TimeSpan(reader.ReadVariableInt64());
     }
+
+
+    public static void Write<T>(ref this T writer, DateTime t)
+        where T : struct, IByteWriter
+    {
+        writer.Write((byte)t.Kind);
+        writer.WriteVariableInt64(t.Ticks);
+    }
+
+    public static DateTime ReadDateTime<T>(ref this T reader)
+        where T : struct, IByteReader
+    {
+        var kind = (DateTimeKind)reader.ReadUInt8();
+        var ticks = reader.ReadVariableInt64();
+        return new DateTime(ticks, kind);
+    }
 }

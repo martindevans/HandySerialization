@@ -126,6 +126,14 @@ public class FloatTests
         }
     }
 
+    [TestMethod]
+    public void OutOfRangeFloat24()
+    {
+        var serializer = new TestWriterReader();
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => serializer.WriteRangeLimitedFloat24(-1, 0, 10));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => serializer.WriteRangeLimitedFloat24(11, 0, 10));
+    }
+
     private static void CheckCompressionStats<T>(Span<T> sequence, TestWriterReader serializer)
     {
         var expected = sequence.Length * Marshal.SizeOf<T>() + 4;

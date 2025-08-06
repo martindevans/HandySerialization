@@ -82,6 +82,19 @@ namespace HandySerialization.Tests
         }
 
         [TestMethod]
+        public void CompressedQuaternionRoundTripZeroElements()
+        {
+            // Check that the identity quaternion is perfectly round tripped.
+
+            var qin = Quaternion.Identity;
+            var serializer = new TestWriterReader();
+            serializer.WriteCompressedQuaternion(qin);
+            var qout = serializer.ReadCompressedQuaternion();
+
+            Assert.AreEqual(qin, qout);
+        }
+
+        [TestMethod]
         public void CompressedQuaternionRoundTrip()
         {
             var rng = new Random(3572456);
@@ -247,6 +260,27 @@ namespace HandySerialization.Tests
 
                 Console.WriteLine(serializer.UnreadBytes);
                 var vout = serializer.ReadVector4();
+                Assert.AreEqual(0, serializer.UnreadBytes);
+
+                Assert.AreEqual(vin, vout);
+            }
+        }
+
+        [TestMethod]
+        public void BigIntegerRoundTrip()
+        {
+            var rng = new Random(3572456);
+
+            const int count = 1_000_000;
+            for (var i = 0; i < count; i++)
+            {
+                var serializer = new TestWriterReader();
+
+                var vin = new BigInteger(rng.NextDouble());
+                serializer.Write(vin);
+
+                Console.WriteLine(serializer.UnreadBytes);
+                var vout = serializer.ReadBigInteger();
                 Assert.AreEqual(0, serializer.UnreadBytes);
 
                 Assert.AreEqual(vin, vout);

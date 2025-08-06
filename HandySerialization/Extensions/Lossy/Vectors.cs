@@ -1,4 +1,6 @@
-﻿namespace HandySerialization.Extensions.Lossy;
+﻿using HandySerialization.Collections;
+
+namespace HandySerialization.Extensions.Lossy;
 
 public static class Vectors
 {
@@ -144,13 +146,13 @@ public static class Vectors
         // 3:      Sign of Z (1 = negative)
         // 2:      Indicates if the output should be an identity quaternion (all other flags ignored if set)
         // 1:      Unused
-        var flags = 0;
+        var flags = new QuaternionBits();
 
         // Identity check
         if (q == Quaternion.Identity)
         {
-            flags |= 0b10;
-            writer.Write((byte)flags);
+            flags.IsIdentity = true;
+            writer.Write((byte)flags.Value);
             return;
         }
 
@@ -160,23 +162,23 @@ public static class Vectors
         // ReSharper disable CompareOfFloatsByEqualityOperator
         // ReSharper disable once ShiftExpressionZeroLeftOperand
         if (max == Math.Abs(q.W))
-            flags |= 0b00 << 6;
+            flags.LargestMagnitude = QuaternionBits.LargestMagnitudeElement.W;
         else if (max == Math.Abs(q.X))
-            flags |= 0b01 << 6;
+            flags.LargestMagnitude = QuaternionBits.LargestMagnitudeElement.X;
         else if (max == Math.Abs(q.Y))
-            flags |= 0b10 << 6;
+            flags.LargestMagnitude = QuaternionBits.LargestMagnitudeElement.Y;
         else if (max == Math.Abs(q.Z))
-            flags |= 0b11 << 6;
+            flags.LargestMagnitude = QuaternionBits.LargestMagnitudeElement.Z;
         // ReSharper restore CompareOfFloatsByEqualityOperator
         
         // Output sign bits
-        flags |= q.W < 0 ? 0b100000 : 0;
-        flags |= q.X < 0 ? 0b010000 : 0;
-        flags |= q.Y < 0 ? 0b001000 : 0;
-        flags |= q.Z < 0 ? 0b000100 : 0;
+        flags.IsWNegative = q.W < 0;
+        flags.IsXNegative = q.X < 0;
+        flags.IsYNegative = q.Y < 0;
+        flags.IsZNegative = q.Z < 0;
 
         // Write the flags
-        writer.Write(checked((byte)flags));
+        writer.Write(flags.Value);
 
         // Write each element, skipping the largest
         // ReSharper disable CompareOfFloatsByEqualityOperator
@@ -210,10 +212,10 @@ public static class Vectors
     {
         const float oneOverSqrt2 = 0.7071067f;
 
-        var flags = reader.ReadUInt8();
+        var flags = new QuaternionBits { Value = reader.ReadUInt8() };
 
         // Check for the special identity flag
-        if ((flags & 0b10) == 0b10)
+        if (flags.IsIdentity)
             return Quaternion.Identity;
 
         // Read the three components, we don't know which is which yet
@@ -223,31 +225,31 @@ public static class Vectors
 
         // Recover all 4 components
         float w = 0, x = 0, y = 0, z = 0;
-        var max = (flags & 0b1100_0000) >> 6;
+        var max = flags.LargestMagnitude;
         switch (max)
         {
-            case 0:
+            case QuaternionBits.LargestMagnitudeElement.W:
                 x = a;
                 y = b;
                 z = c;
                 w = MathF.Sqrt(1 - x * x - y * y - z * z);
                 break;
 
-            case 1:
+            case QuaternionBits.LargestMagnitudeElement.X:
                 w = a;
                 y = b;
                 z = c;
                 x = MathF.Sqrt(1 - w * w - y * y - z * z);
                 break;
 
-            case 2:
+            case QuaternionBits.LargestMagnitudeElement.Y:
                 w = a;
                 x = b;
                 z = c;
                 y = MathF.Sqrt(1 - w * w - x * x - z * z);
                 break;
 
-            case 3:
+            case QuaternionBits.LargestMagnitudeElement.Z:
                 w = a;
                 x = b;
                 y = c;
@@ -256,23 +258,84 @@ public static class Vectors
         }
 
         // Recover signs
-        if ((flags & 0b100000) != 0)
+        if (flags.IsWNegative)
             w = -w;
-        if ((flags & 0b010000) != 0)
+        if (flags.IsXNegative)
             x = -x;
-        if ((flags & 0b001000) != 0)
+        if (flags.IsYNegative)
             y = -y;
-        if ((flags & 0b000100) != 0)
+        if (flags.IsZNegative)
             z = -z;
 
-        // Overwrite values with zero
-        if ((flags & 0b11) == 0b01)
-            x = 0;
-        if ((flags & 0b11) == 0b10)
-            y = 0;
-        if ((flags & 0b11) == 0b11)
-            z = 0;
-
         return Quaternion.Normalize(new Quaternion(x, y, z, w));
+    }
+
+    private struct QuaternionBits
+    {
+        private const byte LargestElementMask = 0b1100_0000;
+        private const int LargestElementShift = 6;
+
+        // [7, 6]: Indicates which component has largest magnitude
+        //           00: W
+        //           01: X
+        //           10: Y
+        //           11: Z
+        // 5:      Sign of W (1 = negative)
+        // 4:      Sign of X (1 = negative)
+        // 3:      Sign of Y (1 = negative)
+        // 2:      Sign of Z (1 = negative)
+        // 1:      Indicates if the output should be an identity quaternion (all other flags ignored if set)
+        // 0:      Unused
+        public Bitfield8 Value;
+
+        public bool IsIdentity
+        {
+            get => Value.Bit1;
+            set => Value.Bit1 = value;
+        }
+
+        public LargestMagnitudeElement LargestMagnitude
+        {
+            get => (LargestMagnitudeElement)((Value & LargestElementMask) >> LargestElementShift);
+            set
+            {
+                // Clear the existing two bits for the largest magnitude
+                Value = (byte)(Value & ~LargestElementMask);
+                // Set the new value
+                Value |= (byte)((int)value << LargestElementShift);
+            }
+        }
+
+        public bool IsWNegative
+        {
+            get => Value.Bit5;
+            set => Value.Bit5 = value;
+        }
+
+        public bool IsXNegative
+        {
+            get => Value.Bit4;
+            set => Value.Bit4 = value;
+        }
+
+        public bool IsYNegative
+        {
+            get => Value.Bit3;
+            set => Value.Bit3 = value;
+        }
+
+        public bool IsZNegative
+        {
+            get => Value.Bit2;
+            set => Value.Bit2 = value;
+        }
+
+        public enum LargestMagnitudeElement
+        {
+            W = 0b00,
+            X = 0b01,
+            Y = 0b10,
+            Z = 0b11
+        }
     }
 }

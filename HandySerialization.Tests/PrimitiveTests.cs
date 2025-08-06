@@ -302,6 +302,25 @@ namespace HandySerialization.Tests
         }
 
         [TestMethod]
+        public void RoundTripDateTime()
+        {
+            var rng = new Random(34576235);
+
+            const int count = 100_000;
+            for (var i = 0; i <= count; i++)
+            {
+                var dtk = (DateTimeKind)rng.Next(0, 3);
+                var input = new DateTime(rng.NextInt64(DateTime.MinValue.Ticks, DateTime.MaxValue.Ticks), dtk);
+
+                var serializer = new TestWriterReader();
+                serializer.Write(input);
+                var output = serializer.ReadDateTime();
+
+                Assert.AreEqual(input, output);
+            }
+        }
+
+        [TestMethod]
         public void RoundTripChar()
         {
             for (var i = 0; i <= (int)ushort.MaxValue; i++)
