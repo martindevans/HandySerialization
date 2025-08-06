@@ -253,7 +253,7 @@ public static class Vectors
         try
         {
             // Write big int to byte array. This cannot fail, since we got the size above
-            Debug.Assert(b.TryWriteBytes(bytesArr, out var bytesWritten));
+            b.TryWriteBytes(bytesArr, out var bytesWritten);
 
             // Write length prefixed data
             writer.WriteVariableUInt64(checked((ulong)bytesWritten));
