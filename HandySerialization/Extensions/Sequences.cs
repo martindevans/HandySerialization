@@ -15,13 +15,50 @@ public static class Sequences
     public static void WriteCompressedSequenceFloat32<T>(ref this T writer, ReadOnlySpan<float> floats)
         where T : struct, IByteWriter
     {
-        var prev = (int)0;
+        var seqWriter = new SequenceFloat32WriterState<T>();
+
         for (var i = 0; i < floats.Length; i++)
+            seqWriter.Write(ref writer, floats[i]);
+    }
+
+    /// <summary>
+    /// Create a writer for a sequence of floats using variable length encoding. For totally uncorrelated
+    /// data this will make the output data about 1.2x <b>larger</b>! However if the data are correlated
+    /// (e.g. with ~1,000,000 of each other) then this will be about 0.85x **smaller**.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public struct SequenceFloat32WriterState<T>
+        where T : struct, IByteWriter
+    {
+        private int _prev;
+
+        public void Write(ref T writer, float value)
         {
-            var fint = BitConverter.SingleToInt32Bits(floats[i]);
-            var xor = fint ^ prev;
-            prev = fint;
+            var fint = BitConverter.SingleToInt32Bits(value);
+            var xor = fint ^ _prev;
+            _prev = fint;
             writer.WriteVariableInt64(xor);
+        }
+    }
+
+    /// <summary>
+    /// Create a reader for a sequence of floats using variable length encoding. This reader
+    /// does not validate the length of the sequence!
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public struct SequenceFloat32ReaderState<T>
+        where T : struct, IByteReader
+    {
+        private int _prev;
+
+        public float Read(ref T reader)
+        {
+            var xor = (int)reader.ReadVariableInt64();
+
+            var fint = xor ^ _prev;
+            _prev = fint;
+
+            return BitConverter.Int32BitsToSingle(fint);
         }
     }
 
@@ -58,7 +95,7 @@ public static class Sequences
     {
         public int Remaining { get; private set; }
 
-        private int _prev = 0;
+        private SequenceFloat32ReaderState<T> _state;
 
         internal SequenceFloat32Reader(int count)
         {
@@ -77,14 +114,7 @@ public static class Sequences
 
             Remaining -= dest.Length;
             for (var i = 0; i < dest.Length; i++)
-            {
-                var xor = (int)reader.ReadVariableInt64();
-
-                var fint = xor ^ _prev;
-                _prev = fint;
-
-                dest[i] = BitConverter.Int32BitsToSingle(fint);
-            }
+                dest[i] = _state.Read(ref reader);
         }
     }
 
@@ -99,13 +129,50 @@ public static class Sequences
     public static void WriteCompressedSequenceFloat64<T>(ref this T writer, ReadOnlySpan<double> doubles)
         where T : struct, IByteWriter
     {
-        var prev = (long)0;
+        var seqWriter = new SequenceFloat64WriterState<T>();
+
         for (var i = 0; i < doubles.Length; i++)
+            seqWriter.Write(ref writer, doubles[i]);
+    }
+
+    /// <summary>
+    /// Create a writer for a sequence of doubles using variable length encoding. For totally uncorrelated
+    /// data this will make the output data about 1.2x <b>larger</b>! However if the data are correlated
+    /// (e.g. with ~1,000,000 of each other) then this will be about 0.85x **smaller**.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public struct SequenceFloat64WriterState<T>
+        where T : struct, IByteWriter
+    {
+        private long _prev;
+
+        public void Write(ref T writer, double value)
         {
-            var fint = BitConverter.DoubleToInt64Bits(doubles[i]);
-            var xor = fint ^ prev;
-            prev = fint;
+            var fint = BitConverter.DoubleToInt64Bits(value);
+            var xor = fint ^ _prev;
+            _prev = fint;
             writer.WriteVariableInt64(xor);
+        }
+    }
+
+    /// <summary>
+    /// Create a reader for a sequence of doubles using variable length encoding. This reader
+    /// does not validate the length of the sequence!
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public struct SequenceFloat64ReaderState<T>
+        where T : struct, IByteReader
+    {
+        private long _prev;
+
+        public double Read(ref T reader)
+        {
+            var xor = (long)reader.ReadVariableInt64();
+
+            var fint = xor ^ _prev;
+            _prev = fint;
+
+            return BitConverter.Int64BitsToDouble(fint);
         }
     }
 
@@ -142,7 +209,7 @@ public static class Sequences
     {
         public int Remaining { get; private set; }
 
-        private long _prev = 0;
+        private SequenceFloat64ReaderState<T> _state;
 
         internal SequenceFloat64Reader(int count)
         {
@@ -161,14 +228,7 @@ public static class Sequences
 
             Remaining -= dest.Length;
             for (var i = 0; i < dest.Length; i++)
-            {
-                var xor = (long)reader.ReadVariableInt64();
-
-                var fint = xor ^ _prev;
-                _prev = fint;
-
-                dest[i] = BitConverter.Int64BitsToDouble(fint);
-            }
+                dest[i] = _state.Read(ref reader);
         }
     }
 
@@ -183,13 +243,50 @@ public static class Sequences
     public static void WriteCompressedSequenceInt32<T>(ref this T writer, ReadOnlySpan<int> ints)
         where T : struct, IByteWriter
     {
-        var prev = (int)0;
+        var seqWriter = new SequenceInt32WriterState<T>();
+
         for (var i = 0; i < ints.Length; i++)
+            seqWriter.Write(ref writer, ints[i]);
+    }
+
+    /// <summary>
+    /// Create a writer for a sequence of ints using variable length encoding. For totally uncorrelated
+    /// data this will make the output data about 1.2x <b>larger</b>! However if the data are correlated
+    /// (e.g. with ~1,000,000 of each other) then this will be about 0.85x **smaller**.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public struct SequenceInt32WriterState<T>
+        where T : struct, IByteWriter
+    {
+        private int _prev;
+
+        public void Write(ref T writer, int value)
         {
-            var fint = (ints[i]);
-            var xor = fint ^ prev;
-            prev = fint;
+            var fint = (value);
+            var xor = fint ^ _prev;
+            _prev = fint;
             writer.WriteVariableInt64(xor);
+        }
+    }
+
+    /// <summary>
+    /// Create a reader for a sequence of ints using variable length encoding. This reader
+    /// does not validate the length of the sequence!
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public struct SequenceInt32ReaderState<T>
+        where T : struct, IByteReader
+    {
+        private int _prev;
+
+        public int Read(ref T reader)
+        {
+            var xor = (int)reader.ReadVariableInt64();
+
+            var fint = xor ^ _prev;
+            _prev = fint;
+
+            return (fint);
         }
     }
 
@@ -226,7 +323,7 @@ public static class Sequences
     {
         public int Remaining { get; private set; }
 
-        private int _prev = 0;
+        private SequenceInt32ReaderState<T> _state;
 
         internal SequenceInt32Reader(int count)
         {
@@ -245,14 +342,7 @@ public static class Sequences
 
             Remaining -= dest.Length;
             for (var i = 0; i < dest.Length; i++)
-            {
-                var xor = (int)reader.ReadVariableInt64();
-
-                var fint = xor ^ _prev;
-                _prev = fint;
-
-                dest[i] = (fint);
-            }
+                dest[i] = _state.Read(ref reader);
         }
     }
 
@@ -267,13 +357,50 @@ public static class Sequences
     public static void WriteCompressedSequenceUInt32<T>(ref this T writer, ReadOnlySpan<uint> uints)
         where T : struct, IByteWriter
     {
-        var prev = (uint)0;
+        var seqWriter = new SequenceUInt32WriterState<T>();
+
         for (var i = 0; i < uints.Length; i++)
+            seqWriter.Write(ref writer, uints[i]);
+    }
+
+    /// <summary>
+    /// Create a writer for a sequence of uints using variable length encoding. For totally uncorrelated
+    /// data this will make the output data about 1.2x <b>larger</b>! However if the data are correlated
+    /// (e.g. with ~1,000,000 of each other) then this will be about 0.85x **smaller**.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public struct SequenceUInt32WriterState<T>
+        where T : struct, IByteWriter
+    {
+        private uint _prev;
+
+        public void Write(ref T writer, uint value)
         {
-            var fint = (uints[i]);
-            var xor = fint ^ prev;
-            prev = fint;
+            var fint = (value);
+            var xor = fint ^ _prev;
+            _prev = fint;
             writer.WriteVariableUInt64(xor);
+        }
+    }
+
+    /// <summary>
+    /// Create a reader for a sequence of uints using variable length encoding. This reader
+    /// does not validate the length of the sequence!
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public struct SequenceUInt32ReaderState<T>
+        where T : struct, IByteReader
+    {
+        private uint _prev;
+
+        public uint Read(ref T reader)
+        {
+            var xor = (uint)reader.ReadVariableUInt64();
+
+            var fint = xor ^ _prev;
+            _prev = fint;
+
+            return (fint);
         }
     }
 
@@ -310,7 +437,7 @@ public static class Sequences
     {
         public int Remaining { get; private set; }
 
-        private uint _prev = 0;
+        private SequenceUInt32ReaderState<T> _state;
 
         internal SequenceUInt32Reader(int count)
         {
@@ -329,14 +456,7 @@ public static class Sequences
 
             Remaining -= dest.Length;
             for (var i = 0; i < dest.Length; i++)
-            {
-                var xor = (uint)reader.ReadVariableUInt64();
-
-                var fint = xor ^ _prev;
-                _prev = fint;
-
-                dest[i] = (fint);
-            }
+                dest[i] = _state.Read(ref reader);
         }
     }
 
@@ -351,13 +471,50 @@ public static class Sequences
     public static void WriteCompressedSequenceInt64<T>(ref this T writer, ReadOnlySpan<long> longs)
         where T : struct, IByteWriter
     {
-        var prev = (long)0;
+        var seqWriter = new SequenceInt64WriterState<T>();
+
         for (var i = 0; i < longs.Length; i++)
+            seqWriter.Write(ref writer, longs[i]);
+    }
+
+    /// <summary>
+    /// Create a writer for a sequence of longs using variable length encoding. For totally uncorrelated
+    /// data this will make the output data about 1.2x <b>larger</b>! However if the data are correlated
+    /// (e.g. with ~1,000,000 of each other) then this will be about 0.85x **smaller**.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public struct SequenceInt64WriterState<T>
+        where T : struct, IByteWriter
+    {
+        private long _prev;
+
+        public void Write(ref T writer, long value)
         {
-            var fint = (longs[i]);
-            var xor = fint ^ prev;
-            prev = fint;
+            var fint = (value);
+            var xor = fint ^ _prev;
+            _prev = fint;
             writer.WriteVariableInt64(xor);
+        }
+    }
+
+    /// <summary>
+    /// Create a reader for a sequence of longs using variable length encoding. This reader
+    /// does not validate the length of the sequence!
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public struct SequenceInt64ReaderState<T>
+        where T : struct, IByteReader
+    {
+        private long _prev;
+
+        public long Read(ref T reader)
+        {
+            var xor = (long)reader.ReadVariableInt64();
+
+            var fint = xor ^ _prev;
+            _prev = fint;
+
+            return (fint);
         }
     }
 
@@ -394,7 +551,7 @@ public static class Sequences
     {
         public int Remaining { get; private set; }
 
-        private long _prev = 0;
+        private SequenceInt64ReaderState<T> _state;
 
         internal SequenceInt64Reader(int count)
         {
@@ -413,14 +570,7 @@ public static class Sequences
 
             Remaining -= dest.Length;
             for (var i = 0; i < dest.Length; i++)
-            {
-                var xor = (long)reader.ReadVariableInt64();
-
-                var fint = xor ^ _prev;
-                _prev = fint;
-
-                dest[i] = (fint);
-            }
+                dest[i] = _state.Read(ref reader);
         }
     }
 
@@ -435,13 +585,50 @@ public static class Sequences
     public static void WriteCompressedSequenceUInt64<T>(ref this T writer, ReadOnlySpan<ulong> ulongs)
         where T : struct, IByteWriter
     {
-        var prev = (ulong)0;
+        var seqWriter = new SequenceUInt64WriterState<T>();
+
         for (var i = 0; i < ulongs.Length; i++)
+            seqWriter.Write(ref writer, ulongs[i]);
+    }
+
+    /// <summary>
+    /// Create a writer for a sequence of ulongs using variable length encoding. For totally uncorrelated
+    /// data this will make the output data about 1.2x <b>larger</b>! However if the data are correlated
+    /// (e.g. with ~1,000,000 of each other) then this will be about 0.85x **smaller**.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public struct SequenceUInt64WriterState<T>
+        where T : struct, IByteWriter
+    {
+        private ulong _prev;
+
+        public void Write(ref T writer, ulong value)
         {
-            var fint = (ulongs[i]);
-            var xor = fint ^ prev;
-            prev = fint;
+            var fint = (value);
+            var xor = fint ^ _prev;
+            _prev = fint;
             writer.WriteVariableUInt64(xor);
+        }
+    }
+
+    /// <summary>
+    /// Create a reader for a sequence of ulongs using variable length encoding. This reader
+    /// does not validate the length of the sequence!
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public struct SequenceUInt64ReaderState<T>
+        where T : struct, IByteReader
+    {
+        private ulong _prev;
+
+        public ulong Read(ref T reader)
+        {
+            var xor = (ulong)reader.ReadVariableUInt64();
+
+            var fint = xor ^ _prev;
+            _prev = fint;
+
+            return (fint);
         }
     }
 
@@ -478,7 +665,7 @@ public static class Sequences
     {
         public int Remaining { get; private set; }
 
-        private ulong _prev = 0;
+        private SequenceUInt64ReaderState<T> _state;
 
         internal SequenceUInt64Reader(int count)
         {
@@ -497,14 +684,7 @@ public static class Sequences
 
             Remaining -= dest.Length;
             for (var i = 0; i < dest.Length; i++)
-            {
-                var xor = (ulong)reader.ReadVariableUInt64();
-
-                var fint = xor ^ _prev;
-                _prev = fint;
-
-                dest[i] = (fint);
-            }
+                dest[i] = _state.Read(ref reader);
         }
     }
 

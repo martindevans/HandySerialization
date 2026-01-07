@@ -393,4 +393,36 @@ public class FloatTests
         // Final result should be the same as the input
         Assert.IsTrue(sequence.SequenceEqual(output));
     }
+
+    [TestMethod]
+    public void InterleavedSequences()
+    {
+        var serializer = new TestWriterReader();
+
+        const int count = 100;
+
+        // Write 3 interleaved sequences
+        var f1w = new Sequences.SequenceFloat32WriterState<TestWriterReader>();
+        var f2w = new Sequences.SequenceFloat32WriterState<TestWriterReader>();
+        var d3w = new Sequences.SequenceFloat64WriterState<TestWriterReader>();
+        var rng = new Random(345346);
+        for (var i = 0; i < count; i++)
+        {
+            f1w.Write(ref serializer, rng.NextSingle());
+            f2w.Write(ref serializer, rng.NextSingle());
+            d3w.Write(ref serializer, rng.NextDouble());
+        }
+
+        // Read them back
+        var f1r = new Sequences.SequenceFloat32ReaderState<TestWriterReader>();
+        var f2r = new Sequences.SequenceFloat32ReaderState<TestWriterReader>();
+        var d3r = new Sequences.SequenceFloat64ReaderState<TestWriterReader>();
+        rng = new Random(345346);
+        for (var i = 0; i < count; i++)
+        {
+            Assert.AreEqual(rng.NextSingle(), f1r.Read(ref serializer));
+            Assert.AreEqual(rng.NextSingle(), f2r.Read(ref serializer));
+            Assert.AreEqual(rng.NextDouble(), d3r.Read(ref serializer));
+        }
+    }
 }

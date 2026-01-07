@@ -87,6 +87,7 @@ public static class Sequences
     {
         var input = config.TypeAlias + "s";
         var readerType = $"Sequence{config.Name}Reader";
+        var writerType = $"Sequence{config.Name}Writer";
 #>
     /// <summary>
     /// Write a sequence of <#=config.TypeAlias#>s with a fixed length (length must be known by reader) using variable length encoding. For
@@ -99,17 +100,58 @@ public static class Sequences
     public static void WriteCompressedSequence<#=config.Name#><T>(ref this T writer, ReadOnlySpan<<#=config.TypeAlias#>> <#=input#>)
         where T : struct, IByteWriter
     {
-        var prev = (<#=config.IntAlias#>)0;
+        var seqWriter = new <#=writerType#>State<T>();
+
         for (var i = 0; i < <#=input#>.Length; i++)
+            seqWriter.Write(ref writer, <#=input#>[i]);
+    }
+
+    /// <summary>
+    /// Create a writer for a sequence of <#=config.TypeAlias#>s using variable length encoding. For totally uncorrelated
+    /// data this will make the output data about 1.2x <b>larger</b>! However if the data are correlated
+    /// (e.g. with ~1,000,000 of each other) then this will be about 0.85x **smaller**.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public struct <#=writerType#>State<T>
+        where T : struct, IByteWriter
+    {
+        private <#=config.IntAlias#> _prev;
+
+        public void Write(ref T writer, <#=config.TypeAlias#> value)
         {
-            var fint = <#=config.ConvToInt#>(<#=input#>[i]);
-            var xor = fint ^ prev;
-            prev = fint;
+            var fint = <#=config.ConvToInt#>(value);
+            var xor = fint ^ _prev;
+            _prev = fint;
 <# if (config.Unsigned) { #>
             writer.WriteVariableUInt64(xor);
 <# } else { #>
             writer.WriteVariableInt64(xor);
 <# } #>
+        }
+    }
+
+    /// <summary>
+    /// Create a reader for a sequence of <#=config.TypeAlias#>s using variable length encoding. This reader
+    /// does not validate the length of the sequence!
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public struct <#=readerType#>State<T>
+        where T : struct, IByteReader
+    {
+        private <#=config.IntAlias#> _prev;
+
+        public <#=config.TypeAlias#> Read(ref T reader)
+        {
+<# if (config.Unsigned) { #>
+            var xor = (<#=config.IntAlias#>)reader.ReadVariableUInt64();
+<# } else { #>
+            var xor = (<#=config.IntAlias#>)reader.ReadVariableInt64();
+<# } #>
+
+            var fint = xor ^ _prev;
+            _prev = fint;
+
+            return <#=config.ConvToType#>(fint);
         }
     }
 
@@ -146,7 +188,7 @@ public static class Sequences
     {
         public int Remaining { get; private set; }
 
-        private <#=config.IntAlias#> _prev = 0;
+        private <#=readerType#>State<T> _state;
 
         internal <#=readerType#>(int count)
         {
@@ -165,18 +207,7 @@ public static class Sequences
 
             Remaining -= dest.Length;
             for (var i = 0; i < dest.Length; i++)
-            {
-<# if (config.Unsigned) { #>
-                var xor = (<#=config.IntAlias#>)reader.ReadVariableUInt64();
-<# } else { #>
-                var xor = (<#=config.IntAlias#>)reader.ReadVariableInt64();
-<# } #>
-
-                var fint = xor ^ _prev;
-                _prev = fint;
-
-                dest[i] = <#=config.ConvToType#>(fint);
-            }
+                dest[i] = _state.Read(ref reader);
         }
     }
 
