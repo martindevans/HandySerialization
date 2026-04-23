@@ -267,6 +267,49 @@ namespace HandySerialization.Tests
         }
 
         [TestMethod]
+        public void ComplexRoundTrip()
+        {
+            var rng = new Random(3572456);
+
+            const int count = 1_000_000;
+            for (var i = 0; i < count; i++)
+            {
+                var serializer = new TestWriterReader();
+
+                var cin = new Complex(rng.NextDouble() * rng.Next(), rng.NextDouble() * rng.Next());
+                serializer.Write(cin);
+
+                Console.WriteLine(serializer.UnreadBytes);
+                var cout = serializer.ReadComplex();
+                Assert.AreEqual(0, serializer.UnreadBytes);
+
+                Assert.AreEqual(cin, cout);
+            }
+        }
+
+        [TestMethod]
+        public void PlaneRoundTrip()
+        {
+            var rng = new Random(3572456);
+
+            const int count = 1_000_000;
+            for (var i = 0; i < count; i++)
+            {
+                var serializer = new TestWriterReader();
+
+                var normal = Vector3.Normalize(new Vector3(rng.NextSingle() * 2 - 1, rng.NextSingle() * 2 - 1, rng.NextSingle() * 2 - 1));
+                var pin = new Plane(normal, rng.NextSingle() * rng.Next());
+                serializer.Write(pin);
+
+                Console.WriteLine(serializer.UnreadBytes);
+                var pout = serializer.ReadPlane();
+                Assert.AreEqual(0, serializer.UnreadBytes);
+
+                Assert.AreEqual(pin, pout);
+            }
+        }
+
+        [TestMethod]
         public void BigIntegerRoundTrip()
         {
             var rng = new Random(3572456);
