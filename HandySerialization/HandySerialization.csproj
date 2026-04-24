@@ -7,7 +7,7 @@
     <LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>10.2.0</Version>
+    <Version>10.3.0</Version>
     <Title>Handy Serialization</Title>
     <Authors>Martin Evans</Authors>
     <Description>HandySerializtion is a simple serialization library.</Description>
