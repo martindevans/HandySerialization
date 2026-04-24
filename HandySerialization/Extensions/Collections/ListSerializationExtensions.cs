@@ -43,7 +43,7 @@ public static class ListSerializationExtensions
     }
 
     /// <summary>
-    /// Read a dictionary previously written with <see cref="Write{TWriter, TKey, TValue}"/>
+    /// Read a list previously written with <see cref="Write{TWriter, TKey, TValue}"/>
     /// </summary>
     /// <typeparam name="TReader"></typeparam>
     /// <typeparam name="TValue"></typeparam>
@@ -58,7 +58,7 @@ public static class ListSerializationExtensions
     }
 
     /// <summary>
-    /// Read a dictionary with adapters
+    /// Read a list with adapters
     /// </summary>
     /// <typeparam name="TReader"></typeparam>
     /// <typeparam name="TValue"></typeparam>
@@ -81,7 +81,7 @@ public static class ListSerializationExtensions
     }
 
     /// <summary>
-    /// Read a dictionary with adapters
+    /// Read a list with adapters
     /// </summary>
     /// <typeparam name="TReader"></typeparam>
     /// <typeparam name="TValue"></typeparam>
@@ -98,12 +98,10 @@ public static class ListSerializationExtensions
     }
 
     /// <summary>
-    /// Read a dictionary with adapters
+    /// Read a list with adapters
     /// </summary>
     /// <typeparam name="TReader"></typeparam>
     /// <typeparam name="TValue"></typeparam>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TKeyAdapter"></typeparam>
     /// <typeparam name="TValueAdapter"></typeparam>
     /// <param name="reader"></param>
     public static List<TValue> ReadList<TReader, TValue, TValueAdapter>(ref this TReader reader)
