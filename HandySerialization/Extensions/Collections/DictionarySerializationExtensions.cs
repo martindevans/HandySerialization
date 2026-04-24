@@ -130,7 +130,7 @@ public static class DictionarySerializationExtensions
     /// <param name="reader"></param>
     /// <param name="keyAdapter"></param>
     /// <param name="valAdapter"></param>
-    public static Dictionary<TKey, TValue> ReadDictionary<TReader, TKey, TKeyAdapter, TValue, TValueAdapter>(this ref TReader reader, TKeyAdapter keyAdapter, TValueAdapter valAdapter)
+    public static Dictionary<TKey, TValue> ReadDictionary<TReader, TKey, TKeyAdapter, TValue, TValueAdapter>(ref this TReader reader, TKeyAdapter keyAdapter, TValueAdapter valAdapter)
         where TReader : struct, IByteReader
         where TKeyAdapter : ISerializationAdapter<TKey>
         where TValueAdapter : ISerializationAdapter<TValue>
@@ -150,7 +150,7 @@ public static class DictionarySerializationExtensions
     /// <typeparam name="TKeyAdapter"></typeparam>
     /// <typeparam name="TValueAdapter"></typeparam>
     /// <param name="reader"></param>
-    public static Dictionary<TKey, TValue> ReadDictionary<TReader, TKey, TKeyAdapter, TValue, TValueAdapter>(this ref TReader reader)
+    public static Dictionary<TKey, TValue> ReadDictionary<TReader, TKey, TKeyAdapter, TValue, TValueAdapter>(ref this TReader reader)
         where TReader : struct, IByteReader
         where TKeyAdapter : ISerializationAdapter<TKey>, new()
         where TValueAdapter : ISerializationAdapter<TValue>, new()
