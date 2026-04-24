@@ -15,8 +15,8 @@ namespace HandySerialization.Tests
             var output = serializer.ReadDictionary<TestWriterReader, string, StringAdapter, string, StringAdapter>();
 
             CollectionAssert.AreEqual(
-                input.ToArray(),
-                output.ToArray()
+                input.OrderBy(a => a.Key).ToArray(),
+                output.OrderBy(a => a.Key).ToArray()
             );
         }
 
@@ -34,8 +34,8 @@ namespace HandySerialization.Tests
             var output = serializer.ReadDictionary<TestWriterReader, string, StringAdapter, string, StringAdapter>();
 
             CollectionAssert.AreEqual(
-                input.ToArray(),
-                output.ToArray()
+                input.OrderBy(a => a.Key).ToArray(),
+                output.OrderBy(a => a.Key).ToArray()
             );
         }
     }
