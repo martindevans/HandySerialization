@@ -76,7 +76,7 @@ public static class ListSerializationExtensions
         for (var i = 0; i < count; i++)
         {
             var v = valAdapter.Read(ref reader);
-            output[i] = v;
+            output.Add(v);
         }
     }
 
