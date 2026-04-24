@@ -12,8 +12,8 @@ public class FloatTests
     {
         var serializer = new TestWriterReader();
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => serializer.WriteNormalizedFloat8(-1));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => serializer.WriteNormalizedFloat8(1.1f));
+        Assert.Throws<ArgumentOutOfRangeException>(() => serializer.WriteNormalizedFloat8(-1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => serializer.WriteNormalizedFloat8(1.1f));
     }
 
     [TestMethod]
@@ -37,8 +37,8 @@ public class FloatTests
     {
         var serializer = new TestWriterReader();
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => serializer.WriteNormalizedFloat16(-1));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => serializer.WriteNormalizedFloat16(1.1f));
+        Assert.Throws<ArgumentOutOfRangeException>(() => serializer.WriteNormalizedFloat16(-1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => serializer.WriteNormalizedFloat16(1.1f));
     }
 
     [TestMethod]
@@ -130,8 +130,8 @@ public class FloatTests
     public void OutOfRangeFloat24()
     {
         var serializer = new TestWriterReader();
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => serializer.WriteRangeLimitedFloat24(-1, 0, 10));
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => serializer.WriteRangeLimitedFloat24(11, 0, 10));
+        Assert.Throws<ArgumentOutOfRangeException>(() => serializer.WriteRangeLimitedFloat24(-1, 0, 10));
+        Assert.Throws<ArgumentOutOfRangeException>(() => serializer.WriteRangeLimitedFloat24(11, 0, 10));
     }
 
     private static void CheckCompressionStats<T>(Span<T> sequence, TestWriterReader serializer)
@@ -166,7 +166,7 @@ public class FloatTests
 
             serializer.WriteCompressedLengthPrefixedSequenceFloat32(sequence);
 
-            CheckCompressionStats<float>(sequence, serializer);
+            CheckCompressionStats(sequence, serializer);
 
             var seq = serializer.ReadCompressedLengthPrefixedSequenceFloat32();
             seq.Read(ref serializer, output);
@@ -197,7 +197,7 @@ public class FloatTests
 
             serializer.WriteCompressedLengthPrefixedSequenceFloat64(sequence);
 
-            CheckCompressionStats<double>(sequence, serializer);
+            CheckCompressionStats(sequence, serializer);
 
             var seq = serializer.ReadCompressedLengthPrefixedSequenceFloat64();
             seq.Read(ref serializer, output);
@@ -228,7 +228,7 @@ public class FloatTests
 
             serializer.WriteCompressedLengthPrefixedSequenceInt32(sequence);
 
-            CheckCompressionStats<int>(sequence, serializer);
+            CheckCompressionStats(sequence, serializer);
 
             var seq = serializer.ReadCompressedLengthPrefixedSequenceInt32();
             seq.Read(ref serializer, output);
@@ -259,7 +259,7 @@ public class FloatTests
 
             serializer.WriteCompressedLengthPrefixedSequenceUInt32(sequence);
 
-            CheckCompressionStats<uint>(sequence, serializer);
+            CheckCompressionStats(sequence, serializer);
 
             var seq = serializer.ReadCompressedLengthPrefixedSequenceUInt32();
             seq.Read(ref serializer, output);
@@ -290,7 +290,7 @@ public class FloatTests
 
             serializer.WriteCompressedLengthPrefixedSequenceInt64(sequence);
 
-            CheckCompressionStats<long>(sequence, serializer);
+            CheckCompressionStats(sequence, serializer);
 
             var seq = serializer.ReadCompressedLengthPrefixedSequenceInt64();
             seq.Read(ref serializer, output);
@@ -321,7 +321,7 @@ public class FloatTests
 
             serializer.WriteCompressedLengthPrefixedSequenceUInt64(sequence);
 
-            CheckCompressionStats<ulong>(sequence, serializer);
+            CheckCompressionStats(sequence, serializer);
 
             var seq = serializer.ReadCompressedLengthPrefixedSequenceUInt64();
             seq.Read(ref serializer, output);
@@ -363,7 +363,9 @@ public class FloatTests
         var rng = new Random(5683656);
 
         const int count = 3000;
-        Assert.IsTrue(count % 3 == 0);
+#pragma warning disable MSTEST0032
+        Assert.AreEqual(0, count % 3);
+#pragma warning restore MSTEST0032
 
         var sequence = new double[count];
         var output = new double[count];

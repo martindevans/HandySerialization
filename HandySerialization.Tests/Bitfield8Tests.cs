@@ -105,8 +105,8 @@ public class Bitfield8Tests
     {
         var bits = new Bitfield8(0);
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => { var _ = bits[-1]; });
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => { var _ = bits[8]; });
+        Assert.Throws<ArgumentOutOfRangeException>(() => { var _ = bits[-1]; });
+        Assert.Throws<ArgumentOutOfRangeException>(() => { var _ = bits[8]; });
     }
 
     [TestMethod]
@@ -114,8 +114,8 @@ public class Bitfield8Tests
     {
         var bits = new Bitfield8(0);
 
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => bits[-1] = true);
-        Assert.ThrowsException<ArgumentOutOfRangeException>(() => bits[8] = false);
+        Assert.Throws<ArgumentOutOfRangeException>(() => bits[-1] = true);
+        Assert.Throws<ArgumentOutOfRangeException>(() => bits[8] = false);
     }
 
     [TestMethod]
@@ -138,7 +138,7 @@ public class Bitfield8Tests
         Assert.AreEqual(215, destinationByte);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow((byte)0, "00000000")]
     [DataRow((byte)255, "11111111")]
     [DataRow((byte)42, "00101010")]

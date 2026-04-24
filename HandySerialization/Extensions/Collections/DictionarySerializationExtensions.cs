@@ -3,28 +3,6 @@
 public static class DictionarySerializationExtensions
 {
     /// <summary>
-    /// Write a dictionary with fully generic key and value
-    /// </summary>
-    /// <typeparam name="TWriter"></typeparam>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
-    /// <param name="writer"></param>
-    /// <param name="value"></param>
-    public static void Write<TWriter, TKey, TValue>(ref this TWriter writer, IReadOnlyDictionary<TKey, TValue> value)
-        where TWriter : struct, IByteWriter
-        where TKey : IByteSerializable<TKey>
-        where TValue : IByteSerializable<TValue>
-    {
-        writer.WriteVariableUInt64((ulong)value.Count);
-
-        foreach (var (key, val) in value)
-        {
-            writer.Write(key);
-            writer.Write(val);
-        }
-    }
-
-    /// <summary>
     /// Write a dictionary with adapters
     /// </summary>
     /// <typeparam name="TWriter"></typeparam>
@@ -33,27 +11,26 @@ public static class DictionarySerializationExtensions
     /// <typeparam name="TValue"></typeparam>
     /// <typeparam name="TValueAdapter"></typeparam>
     /// <param name="writer"></param>
-    /// <param name="value"></param>
+    /// <param name="dict"></param>
     /// <param name="keyAdapter"></param>
     /// <param name="valAdapter"></param>
-    public static void Write<TWriter, TKey, TKeyAdapter, TValue, TValueAdapter>(ref this TWriter writer, IReadOnlyDictionary<TKey, TValue> value, TKeyAdapter keyAdapter, TValueAdapter valAdapter)
+    public static void Write<TWriter, TKey, TKeyAdapter, TValue, TValueAdapter>(ref this TWriter writer, IReadOnlyDictionary<TKey, TValue> dict, TKeyAdapter keyAdapter, TValueAdapter valAdapter)
         where TWriter : struct, IByteWriter
         where TKeyAdapter : ISerializationAdapter<TKey>
         where TValueAdapter : ISerializationAdapter<TValue>
         where TKey : notnull
     {
-        writer.WriteVariableUInt64((ulong)value.Count);
+        writer.WriteVariableUInt64((ulong)dict.Count);
 
-        foreach (var (key, val) in value)
+        foreach (var (key, val) in dict)
         {
             keyAdapter.Write(ref writer, key);
             valAdapter.Write(ref writer, val);
         }
     }
-    
 
     /// <summary>
-    /// Read a dictionary previously written with <see cref="Write{TWriter, TKey, TValue}"/>
+    /// Read a dictionary previously written with <see cref="DictionarySerializationExtensions.Write{TWriter, TKey, TKeyAdapter, TValue, TValueAdapter}"/>
     /// </summary>
     /// <typeparam name="TReader"></typeparam>
     /// <typeparam name="TKey"></typeparam>
@@ -73,7 +50,7 @@ public static class DictionarySerializationExtensions
     }
 
     /// <summary>
-    /// Read a dictionary previously written with <see cref="Write{TWriter, TKey, TValue}"/>
+    /// Read a dictionary previously written with <see cref="DictionarySerializationExtensions.Write{TWriter, TKey, TKeyAdapter, TValue, TValueAdapter}"/>
     /// </summary>
     /// <typeparam name="TReader"></typeparam>
     /// <typeparam name="TKey"></typeparam>
@@ -91,7 +68,7 @@ public static class DictionarySerializationExtensions
     }
 
     /// <summary>
-    /// Read a dictionary with adapters
+    /// Read a dictionary with adapters previously written with <see cref="DictionarySerializationExtensions.Write{TWriter, TKey, TKeyAdapter, TValue, TValueAdapter}"/>
     /// </summary>
     /// <typeparam name="TReader"></typeparam>
     /// <typeparam name="TValue"></typeparam>
@@ -120,7 +97,7 @@ public static class DictionarySerializationExtensions
     }
 
     /// <summary>
-    /// Read a dictionary with adapters
+    /// Read a dictionary with adapters previously written with <see cref="DictionarySerializationExtensions.Write{TWriter, TKey, TKeyAdapter, TValue, TValueAdapter}"/>
     /// </summary>
     /// <typeparam name="TReader"></typeparam>
     /// <typeparam name="TValue"></typeparam>
@@ -142,7 +119,7 @@ public static class DictionarySerializationExtensions
     }
 
     /// <summary>
-    /// Read a dictionary with adapters
+    /// Read a dictionary with adapters previously written with <see cref="DictionarySerializationExtensions.Write{TWriter, TKey, TKeyAdapter, TValue, TValueAdapter}"/>
     /// </summary>
     /// <typeparam name="TReader"></typeparam>
     /// <typeparam name="TValue"></typeparam>
