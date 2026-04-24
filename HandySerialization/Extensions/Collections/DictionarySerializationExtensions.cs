@@ -29,43 +29,6 @@ public static class DictionarySerializationExtensions
         }
     }
 
-    /// <summary>
-    /// Read a dictionary previously written with <see cref="DictionarySerializationExtensions.Write{TWriter, TKey, TKeyAdapter, TValue, TValueAdapter}"/>
-    /// </summary>
-    /// <typeparam name="TReader"></typeparam>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
-    /// <param name="reader"></param>
-    /// <param name="output"></param>
-    public static void ReadDictionary<TReader, TKey, TValue>(ref this TReader reader, Dictionary<TKey, TValue> output)
-        where TReader : struct, IByteReader
-        where TKey : IByteSerializable<TKey>, new()
-        where TValue : IByteSerializable<TValue>, new()
-    {
-        reader.ReadDictionary(
-            output,
-            new GenericAdapter<TKey>(),
-            new GenericAdapter<TValue>()
-        );
-    }
-
-    /// <summary>
-    /// Read a dictionary previously written with <see cref="DictionarySerializationExtensions.Write{TWriter, TKey, TKeyAdapter, TValue, TValueAdapter}"/>
-    /// </summary>
-    /// <typeparam name="TReader"></typeparam>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
-    /// <param name="reader"></param>
-    public static Dictionary<TKey, TValue> ReadDictionary<TReader, TKey, TValue>(ref this TReader reader)
-        where TReader : struct, IByteReader
-        where TKey : IByteSerializable<TKey>, new()
-        where TValue : IByteSerializable<TValue>, new()
-    {
-        return reader.ReadDictionary<TReader, TKey, GenericAdapter<TKey>, TValue, GenericAdapter<TValue>>(
-            new GenericAdapter<TKey>(),
-            new GenericAdapter<TValue>()
-        );
-    }
 
     /// <summary>
     /// Read a dictionary with adapters previously written with <see cref="DictionarySerializationExtensions.Write{TWriter, TKey, TKeyAdapter, TValue, TValueAdapter}"/>

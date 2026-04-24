@@ -12,7 +12,7 @@ namespace HandySerialization.Tests
 
             var input = new List<string>();
             serializer.Write(input, new StringAdapter());
-            var output = serializer.ReadList<TestWriterReader, string, StringAdapter>(new StringAdapter());
+            var output = serializer.ReadList<TestWriterReader, string, StringAdapter>();
 
             CollectionAssert.AreEqual(input, output);
         }
@@ -24,7 +24,7 @@ namespace HandySerialization.Tests
 
             var input = new List<string> { "a", "b", "c" };
             serializer.Write(input, new StringAdapter());
-            var output = serializer.ReadList<TestWriterReader, string, StringAdapter>(new StringAdapter());
+            var output = serializer.ReadList<TestWriterReader, string, StringAdapter>();
 
             CollectionAssert.AreEqual(input, output);
         }

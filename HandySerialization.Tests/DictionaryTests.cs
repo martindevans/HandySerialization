@@ -10,6 +10,7 @@ namespace HandySerialization.Tests
         {
             var serializer = new TestWriterReader();
 
+            // ReSharper disable once CollectionNeverUpdated.Local
             var input = new Dictionary<string, string>();
             serializer.Write(input, new StringAdapter(), new StringAdapter());
             var output = serializer.ReadDictionary<TestWriterReader, string, StringAdapter, string, StringAdapter>();
