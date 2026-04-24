@@ -106,7 +106,7 @@ public static class ListSerializationExtensions
     /// <typeparam name="TKeyAdapter"></typeparam>
     /// <typeparam name="TValueAdapter"></typeparam>
     /// <param name="reader"></param>
-    public static List<TValue> ReadList<TReader, TKey, TKeyAdapter, TValue, TValueAdapter>(ref this TReader reader)
+    public static List<TValue> ReadList<TReader, TValue, TValueAdapter>(ref this TReader reader)
         where TReader : struct, IByteReader
         where TValueAdapter : ISerializationAdapter<TValue>, new()
     {
