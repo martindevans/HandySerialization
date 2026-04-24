@@ -12,7 +12,7 @@ namespace HandySerialization.Tests
 
             var input = new Dictionary<string, string>();
             serializer.Write(input, new StringAdapter(), new StringAdapter());
-            var output = serializer.ReadDictionaryAdapterAdapter<TestWriterReader, string, StringAdapter, string, StringAdapter>();
+            var output = serializer.ReadDictionary<TestWriterReader, string, StringAdapter, string, StringAdapter>();
 
             CollectionAssert.AreEqual(
                 input.ToArray(),
@@ -31,7 +31,7 @@ namespace HandySerialization.Tests
                 { "c", "d" },
             };
             serializer.Write(input, new StringAdapter(), new StringAdapter());
-            var output = serializer.ReadDictionaryAdapterAdapter<TestWriterReader, string, StringAdapter, string, StringAdapter>();
+            var output = serializer.ReadDictionary<TestWriterReader, string, StringAdapter, string, StringAdapter>();
 
             CollectionAssert.AreEqual(
                 input.ToArray(),
