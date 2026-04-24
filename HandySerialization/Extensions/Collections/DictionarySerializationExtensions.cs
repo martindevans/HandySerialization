@@ -10,7 +10,7 @@ public static class DictionarySerializationExtensions
     /// <typeparam name="TValue"></typeparam>
     /// <param name="writer"></param>
     /// <param name="value"></param>
-    public static void Write<TWriter, TKey, TValue>(ref this TWriter writer, Dictionary<TKey, TValue> value)
+    public static void Write<TWriter, TKey, TValue>(ref this TWriter writer, IReadOnlyDictionary<TKey, TValue> value)
         where TWriter : struct, IByteWriter
         where TKey : IByteSerializable<TKey>
         where TValue : IByteSerializable<TValue>
@@ -36,7 +36,7 @@ public static class DictionarySerializationExtensions
     /// <param name="value"></param>
     /// <param name="keyAdapter"></param>
     /// <param name="valAdapter"></param>
-    public static void Write<TWriter, TKey, TKeyAdapter, TValue, TValueAdapter>(ref this TWriter writer, Dictionary<TKey, TValue> value, TKeyAdapter keyAdapter, TValueAdapter valAdapter)
+    public static void Write<TWriter, TKey, TKeyAdapter, TValue, TValueAdapter>(ref this TWriter writer, IReadOnlyDictionary<TKey, TValue> value, TKeyAdapter keyAdapter, TValueAdapter valAdapter)
         where TWriter : struct, IByteWriter
         where TKeyAdapter : ISerializationAdapter<TKey>
         where TValueAdapter : ISerializationAdapter<TValue>
