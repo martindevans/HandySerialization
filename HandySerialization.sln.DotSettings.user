@@ -4,6 +4,12 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=547ada89_002D5d8a_002D44d7_002Db549_002D363b483bcff4/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Session #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;Project Location="C:\Users\Martin\Documents\dotnet\HandySerialization\HandySerialization.Tests" Presentation="&amp;lt;HandySerialization.Tests&amp;gt;" /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=6e6ba711_002Dfd01_002D45e7_002Dbd98_002D062e040f8195/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="All tests from &amp;lt;HandySerialization.Tests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Project Location="C:\Users\Martin\Documents\dotnet\HandySerialization\HandySerialization.Tests" Presentation="&amp;lt;HandySerialization.Tests&amp;gt;" /&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=ef252500_002Dcbde_002D4dd9_002D8aaf_002De15ecf5ef0bb/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="All tests from &amp;lt;HandySerialization.Tests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Project Location="C:\Users\Martin\Documents\dotnet\HandySerialization\HandySerialization.Tests" Presentation="&amp;lt;HandySerialization.Tests&amp;gt;" /&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
 	
 	
 	
