@@ -1,6 +1,4 @@
-﻿using HandySerialization.Wrappers;
-
-namespace HandySerialization;
+﻿namespace HandySerialization;
 
 public interface IByteWriter
 {

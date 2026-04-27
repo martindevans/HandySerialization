@@ -1,4 +1,6 @@
-﻿namespace HandySerialization.Extensions.Collections;
+﻿using HandySerialization.Adapters;
+
+namespace HandySerialization.Extensions.Collections;
 
 public static class ListSerializationExtensions
 {
@@ -20,7 +22,7 @@ public static class ListSerializationExtensions
         for (var i = 0; i < list.Count; i++)
         {
             var item = list[i];
-            valAdapter.Write(ref writer, item);
+            valAdapter.Write(ref writer, in item);
         }
     }
 

@@ -1,5 +1,5 @@
 using HandySerialization.Extensions;
-using System.Numerics;
+using HandySerialization.Adapters;
 
 namespace HandySerialization.Tests
 {
@@ -16,9 +16,9 @@ namespace HandySerialization.Tests
             {
                 var serializer = new TestWriterReader();
 
-                var input = unchecked((ulong)rng.NextInt64());
-                serializer.WriteVariableUInt64(input);
-                var output = serializer.ReadVariableUInt64();
+                var input = unchecked((ulong)rng.NextInt64());    
+                serializer.Write(new VarUInt64Adapter(), in input);
+                var output = serializer.Read<TestWriterReader, VarUInt64Adapter, ulong>(new VarUInt64Adapter());
 
                 Assert.AreEqual(input, output);
             }

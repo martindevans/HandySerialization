@@ -1,3 +1,4 @@
+using HandySerialization.Adapters;
 using HandySerialization.Extensions.Collections;
 
 namespace HandySerialization.Tests
