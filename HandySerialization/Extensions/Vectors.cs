@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace HandySerialization.Extensions;
+﻿namespace HandySerialization.Extensions;
 
 public static class Vectors
 {

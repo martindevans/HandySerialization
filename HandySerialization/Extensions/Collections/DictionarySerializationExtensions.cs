@@ -1,4 +1,6 @@
-﻿namespace HandySerialization.Extensions.Collections;
+﻿using HandySerialization.Adapters;
+
+namespace HandySerialization.Extensions.Collections;
 
 public static class DictionarySerializationExtensions
 {
@@ -24,8 +26,8 @@ public static class DictionarySerializationExtensions
 
         foreach (var (key, val) in dict)
         {
-            keyAdapter.Write(ref writer, key);
-            valAdapter.Write(ref writer, val);
+            keyAdapter.Write(ref writer, in key);
+            valAdapter.Write(ref writer, in val);
         }
     }
 
