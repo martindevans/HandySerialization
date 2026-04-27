@@ -1,4 +1,6 @@
-﻿using HandySerialization.Extensions;
+﻿using HandySerialization.Adapters;
+using HandySerialization.Extensions;
+using HandySerialization.Extensions.Collections;
 
 namespace HandySerialization.Tests;
 
@@ -29,6 +31,20 @@ public class GenericTests
         var input = new TestSerializable(rng.Next(), rng.NextDouble(), rng.NextInt64());
         serializer.Write(input);
         var output = serializer.Read<TestWriterReader, TestSerializable>();
+
+        Assert.AreEqual(input, output);
+    }
+
+    [TestMethod]
+    public void AdapterRoundTrip()
+    {
+        var rng = new Random(68456);
+
+        var serializer = new TestWriterReader();
+
+        var input = new TestSerializable(rng.Next(), rng.NextDouble(), rng.NextInt64());
+        serializer.Write(new GenericAdapter<TestSerializable>(), in input);
+        var output = serializer.Read<TestWriterReader, GenericAdapter<TestSerializable>, TestSerializable>();
 
         Assert.AreEqual(input, output);
     }

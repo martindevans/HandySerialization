@@ -31,6 +31,18 @@ namespace HandySerialization.Tests
         }
 
         [TestMethod]
+        public void SerializeAndDeserializeNonEmptyListNullValue()
+        {
+            var serializer = new TestWriterReader();
+
+            var input = new List<string?> { "a", null, "c" };
+            serializer.Write(input, new NullableStringAdapter());
+            var output = serializer.ReadList<TestWriterReader, string?, NullableStringAdapter>();
+
+            CollectionAssert.AreEqual(input, output);
+        }
+
+        [TestMethod]
         public void SerializeAndDeserializeIntoExistingList()
         {
             var serializer = new TestWriterReader();
