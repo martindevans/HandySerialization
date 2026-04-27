@@ -27,7 +27,7 @@ public static class Adapter
 
     public static TValue Read<TReader, TAdapter, TValue>(ref this TReader reader, TAdapter adapter)
         where TReader : struct, IByteReader
-        where TAdapter : ISerializationAdapter<TValue>, new()
+        where TAdapter : ISerializationAdapter<TValue>
     {
         return adapter.Read(ref reader);
     }
