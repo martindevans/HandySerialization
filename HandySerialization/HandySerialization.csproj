@@ -17,15 +17,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Extensions\NewFolder\**" />
-    <Compile Remove="NewFolder\**" />
-    <EmbeddedResource Remove="Extensions\NewFolder\**" />
-    <EmbeddedResource Remove="NewFolder\**" />
-    <None Remove="Extensions\NewFolder\**" />
-    <None Remove="NewFolder\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.Bcl.Numerics" Version="10.0.7" />
   </ItemGroup>
 
