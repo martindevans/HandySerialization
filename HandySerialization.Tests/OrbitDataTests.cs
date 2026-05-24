@@ -1,8 +1,9 @@
-﻿using System.Diagnostics;
+﻿using HandySerialization.Extensions;
+using HandySerialization.Extensions.Bits;
+using HandySerialization.Wrappers;
+using System.Diagnostics;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
-using HandySerialization.Extensions;
-using HandySerialization.Wrappers;
 
 namespace HandySerialization.Tests;
 
@@ -154,23 +155,33 @@ public class OrbitDataTests
     [TestMethod]
     public void Options()
     {
+        //// AvgBytesPerDatapoint = 47.9
         //var gzip = TestRun((page, stream) => page.Write(new GZipStream(stream, CompressionLevel.Optimal, true)));
         //Console.WriteLine("GZIP (Optimal):" + gzip);
 
+        //// AvgBytesPerDatapoint = 46.3
         //var brotli = TestRun((page, stream) => page.Write(new BrotliStream(stream, CompressionLevel.Optimal, true)));
         //Console.WriteLine("Brotli (Optimal):" + brotli);
 
+        //// AvgBytesPerDatapoint = 47.8
         //var deflateOpt = TestRun((page, stream) => page.Write(new DeflateStream(stream, CompressionLevel.Optimal, true)));
         //Console.WriteLine("DEFLATE (Optimal):" + deflateOpt);
 
-        var custom1 = TestRun(CustomWrite1);
-        Console.WriteLine("CUSTOM1:" + custom1);
+        //// AvgBytesPerDatapoint = 42.2
+        //var custom1 = TestRun(CustomWrite1);
+        //Console.WriteLine("CUSTOM1:" + custom1);
 
-        var custom2 = TestRun(CustomWrite2);
-        Console.WriteLine("CUSTOM2:" + custom2);
+        //// AvgBytesPerDatapoint = 41.0
+        //var custom2 = TestRun(CustomWrite2);
+        //Console.WriteLine("CUSTOM2:" + custom2);
 
+        // AvgBytesPerDatapoint = 19.1
         var custom3 = TestRun(CustomWrite3);
         Console.WriteLine("CUSTOM3:" + custom3);
+
+        // AvgBytesPerDatapoint = 11.9
+        var custom3d = TestRun(CustomWrite3WithDeflate);
+        Console.WriteLine("CUSTOM3+DEFLATE:" + custom3d);
     }
 
     private static void CustomWrite1(OrbitDataPage page, Stream stream)
@@ -246,8 +257,6 @@ public class OrbitDataTests
 
     private static void CustomWrite3(OrbitDataPage page, Stream stream)
     {
-        //using var deflate = new DeflateStream(stream, CompressionLevel.Fastest, true);
-
         var writer = new StreamByteWriter(stream);
 
         writer.Write((ushort)page.Positions.Count);
@@ -265,5 +274,11 @@ public class OrbitDataTests
         writer.WriteDeltaCompressedSequence(pOrder, MemoryMarshal.Cast<double3, double>(page.Positions.ToArray()), 0, 3);
         writer.WriteDeltaCompressedSequence(pOrder, MemoryMarshal.Cast<double3, double>(page.Positions.ToArray()), 1, 3);
         writer.WriteDeltaCompressedSequence(pOrder, MemoryMarshal.Cast<double3, double>(page.Positions.ToArray()), 2, 3);
+    }
+
+    private static void CustomWrite3WithDeflate(OrbitDataPage page, Stream stream)
+    {
+        using var deflate = new DeflateStream(stream, CompressionLevel.Fastest, true);
+        CustomWrite3(page, deflate);
     }
 }
