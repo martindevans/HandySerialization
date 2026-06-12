@@ -10,6 +10,8 @@ on:
     
 jobs:
   build:
+    permissions:
+      id-token: write
 
     env:
       BUILD_CONFIG: 'Release'
