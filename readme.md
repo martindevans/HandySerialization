@@ -38,7 +38,7 @@ public readonly record struct DemoStruct(int A)
         writer.Write(A);
     }
 
-    public TestSerializable Read<TReader>(ref TReader reader)
+    public DemoStruct Read<TReader>(ref TReader reader)
         where TReader : struct, IByteReader
     {
         return new TestSerializable(
@@ -67,7 +67,7 @@ public static class DemoExtensions
         writer.Write(value.A);
     }
 
-    public static TValue ReadDemoStruct<TReader>(this ref TReader reader)
+    public static DemoStruct ReadDemoStruct<TReader>(this ref TReader reader)
         where TReader : struct, IByteReader
     {
         return new DemoStruct(reader.ReadInt32());
